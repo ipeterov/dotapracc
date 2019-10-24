@@ -1,0 +1,39 @@
+{
+  "name": "dotapracc",
+  "version": "1.0.0",
+  "description": "database - https://api.elephantsql.com/console/1e9ee8e6-e3b3-407c-9c13-89cd4efce7d9/details?",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack --mode development --watch ./dotapracc/frontend/src/index.js --output ./dotapracc/frontend/static/frontend/main.js",
+    "build": "webpack --mode production ./dotapracc/frontend/src/index.js --output ./dotapracc/frontend/static/frontend/main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ipeterov/dotapracc.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ipeterov/dotapracc/issues"
+  },
+  "homepage": "https://github.com/ipeterov/dotapracc#readme",
+  "devDependencies": {
+    "@babel/core": "^7.6.4",
+    "@babel/preset-env": "^7.6.3",
+    "@babel/preset-react": "^7.6.3",
+    "babel-loader": "^8.0.6",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "bable-loader": "0.0.1-security",
+    "css-loader": "^3.2.0",
+    "prop-types": "^15.7.2",
+    "react": "^16.11.0",
+    "react-dom": "^16.11.0",
+    "style-loader": "^1.0.0",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.9"
+  },
+  "dependencies": {
+    "react-bulma-components": "^3.1.3"
+  }
+}
