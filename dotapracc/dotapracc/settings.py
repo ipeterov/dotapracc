@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'social_django',
 
+    'core',
     'frontend',
 ]
 
@@ -89,6 +90,7 @@ DATABASES = {
         'PASSWORD': 'TvN3hkt5muFSVVMI7eDOb6-18fcBYxbD',
         'HOST': 'balarama.db.elephantsql.com',
         'PORT': '5432',
+        'CONN_MAX_AGE': 0,
     }
 }
 
@@ -111,6 +113,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.open_id.OpenIdAuth',
+    'social_core.backends.steam.SteamOpenId',
+
+    'django.contrib.auth.backends.ModelBackend',
+)
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
@@ -131,15 +140,15 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-
 SOCIAL_AUTH_POSTGRES_JSONFIELD = True
-
-AUTHENTICATION_BACKENDS = (
-    'social_core.backends.open_id.OpenIdAuth',
-    'social_core.backends.steam.SteamOpenId',
-
-    'django.contrib.auth.backends.ModelBackend',
-)
-
-SOCIAL_AUTH_STEAM_API_KEY = "76B443C4F8CCE0375BADA98502E49A3D"
+SOCIAL_AUTH_STEAM_API_KEY = '76B443C4F8CCE0375BADA98502E49A3D'
 SOCIAL_AUTH_STEAM_EXTRA_DATA = ['player']
+
+
+OPENDOTA_API_URL = 'https://api.opendota.com/api/'
+OPENDOTA_API_KEY = 'fb3453ae-3631-49a9-b719-8681d4156fa8'
+
+DOTABUFF_URL = 'https://dotabuff.com/'
+DOTABUFF_SCRAPE_USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'
+
+AUTOMATCHUP_TOP_COUNT = 10
