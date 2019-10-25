@@ -1,14 +1,12 @@
 import React from "react";
 import ReactDOM from "react-dom";
-
 import 'react-bulma-components/dist/react-bulma-components.min.css';
-import { Button } from 'react-bulma-components';
 
+import HomePage from "./HomePage.jsx"
 
-console.log(Button);
 
 const App = () => (
-    <Button color="primary">My Bulma button</Button>
+    <HomePage />
 );
 
 

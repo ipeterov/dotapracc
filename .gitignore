@@ -243,9 +243,6 @@ $RECYCLE.BIN/
 *.css.map
 
 
-### Less ###
-*.css
-
 
 ### grunt ###
 # Grunt usually compiles files inside this directory
