@@ -62,8 +62,12 @@ class HeroMatchup(models.Model):
 
 
 class SelectedHero(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    hero = models.ForeignKey(Hero, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='selected_heroes',
+    )
+    hero = models.ForeignKey(
+        Hero, on_delete=models.CASCADE, related_name='+',
+    )
 
     auto_meta = models.BooleanField()
     auto_counterpick = models.BooleanField()

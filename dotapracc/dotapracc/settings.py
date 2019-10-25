@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'rest_framework',
+    'graphene_django',
     'social_django',
 
     'core',
@@ -143,6 +143,11 @@ STATIC_URL = '/static/'
 SOCIAL_AUTH_POSTGRES_JSONFIELD = True
 SOCIAL_AUTH_STEAM_API_KEY = '76B443C4F8CCE0375BADA98502E49A3D'
 SOCIAL_AUTH_STEAM_EXTRA_DATA = ['player']
+
+
+GRAPHENE = {
+    'SCHEMA': 'dotapracc.schema.schema',
+}
 
 
 OPENDOTA_API_URL = 'https://api.opendota.com/api/'
