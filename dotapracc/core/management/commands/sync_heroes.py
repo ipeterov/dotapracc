@@ -9,7 +9,6 @@ from ...opendota import OpenDotaAPI
 class Command(BaseCommand):
     help = 'Imports heroes and matchup data from OpenDota and DotaBuff'
 
-    @transaction.atomic
     def import_heroes(self):
         print('Importing heroes...')
         raw_heroes = self.odota_api.get_heroes()
@@ -28,7 +27,6 @@ class Command(BaseCommand):
             existing_hero_ids.add(hero.opendota_id)
         return heroes
 
-    @transaction.atomic
     def import_matchups(self, heroes):
         def create_matchups(hero_opendota_id, raw_matchups):
             hero_id = hero_id_by_opendota_id[hero_opendota_id]
@@ -77,6 +75,7 @@ class Command(BaseCommand):
             print(f'Saving {hero} meta...')
             hero.save()
 
+    @transaction.atomic
     def handle(self, *args, **options):
         self.odota_api = OpenDotaAPI()
         self.db_api = DotaBuffAPI()
@@ -84,3 +83,5 @@ class Command(BaseCommand):
         heroes = self.import_heroes()
         self.import_meta(heroes)
         self.import_matchups(heroes)
+        for hero in heroes:
+            hero.update_matchups()

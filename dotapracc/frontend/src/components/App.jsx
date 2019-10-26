@@ -1,13 +1,23 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import 'react-bulma-components/dist/react-bulma-components.min.css';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { ApolloProvider } from '@apollo/react-hooks';
+import ApolloClient from 'apollo-boost';
 
-import HomePage from "./HomePage.jsx"
+import Base from './Base.jsx'
 
 
-const App = () => (
-    <HomePage />
-);
+const client = new ApolloClient({
+  uri: 'http://localhost:8000/gql/',
+});
 
+class App extends React.Component {
+  render() {
+    return (
+      <ApolloProvider client={client}>
+        <Base/>
+      </ApolloProvider>
+    )
+  }
+}
 
 ReactDOM.render(<App />, document.getElementById("app"));

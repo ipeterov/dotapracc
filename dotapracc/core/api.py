@@ -6,6 +6,11 @@ from django.contrib.auth.models import User
 from .models import SelectedHero, Hero
 
 
+class HeroType(DjangoObjectType):
+    class Meta:
+        model = Hero
+
+
 class SelectedHeroType(DjangoObjectType):
     class Meta:
         model = SelectedHero
@@ -19,11 +24,6 @@ class UserType(DjangoObjectType):
 
     def resolve_selected_heroes(self, info, **kwargs):
         return self.selected_heroes.all()
-
-
-class HeroType(DjangoObjectType):
-    class Meta:
-        model = Hero
 
 
 class Query(graphene.ObjectType):

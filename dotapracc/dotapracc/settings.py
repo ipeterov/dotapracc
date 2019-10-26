@@ -27,7 +27,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -156,4 +155,4 @@ OPENDOTA_API_KEY = 'fb3453ae-3631-49a9-b719-8681d4156fa8'
 DOTABUFF_URL = 'https://dotabuff.com/'
 DOTABUFF_SCRAPE_USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'
 
-AUTOMATCHUP_TOP_COUNT = 10
+TOP_N_MATCHUPS = 5

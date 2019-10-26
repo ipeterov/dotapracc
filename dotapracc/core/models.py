@@ -36,17 +36,34 @@ class Hero(models.Model):
     offlane_presence = models.FloatField(default=0)
     jungle_presence = models.FloatField(default=0)
 
+    counters = models.ManyToManyField('self', blank=True, related_name='+')
+    easy_lanes = models.ManyToManyField('self', blank=True, related_name='+')
+
     objects = HeroQuerySet.as_manager()
 
     def __str__(self):
         return self.name
+
+    def update_matchups(self):
+        midlaners = Hero.objects.lane_occupants('mid')
+        matchup_qs = (
+            self.matchups
+                .select_related('other_hero')
+                .filter(other_hero__in=midlaners)
+        )
+
+        counters = matchup_qs.order_by('advantage')[:settings.TOP_N_MATCHUPS]
+        self.counters.set(matchup.other_hero for matchup in counters)
+
+        easy_lanes = matchup_qs.order_by('-advantage')[:settings.TOP_N_MATCHUPS]
+        self.easy_lanes.set(matchup.other_hero for matchup in easy_lanes)
 
 
 class HeroMatchup(models.Model):
     hero = models.ForeignKey(
         Hero,
         on_delete=models.CASCADE,
-        related_name='+',
+        related_name='matchups',
     )
     other_hero = models.ForeignKey(
         Hero,
@@ -69,50 +86,29 @@ class SelectedHero(models.Model):
         Hero, on_delete=models.CASCADE, related_name='+',
     )
 
-    auto_meta = models.BooleanField()
-    auto_counterpick = models.BooleanField()
-    auto_stomp = models.BooleanField()
+    add_all_mids = models.BooleanField()
+    add_counters = models.BooleanField()
+    add_easy_lanes = models.BooleanField()
 
     wanted_matchups = models.ManyToManyField(
         Hero, blank=True, related_name='+',
     )
 
-    total_matchups = models.ManyToManyField(Hero, blank=True, related_name='+')
-
     def __str__(self):
-        return f'{self.user.username} wants to play {self.hero}'
+        return f'{self.user.username} is training {self.hero}'
 
     def calculate_matchups(self):
         calculated_matchups = []
         calculated_matchups.extend(self.wanted_matchups.all())
 
-        midlaners = Hero.objects.lane_occupants('mid')
-        matchup_qs = (
-            HeroMatchup.objects
-                .select_related('other_hero')
-                .filter(hero=self.hero, other_hero__in=midlaners)
-        )
-
-        if self.auto_counterpick:
-            counterpicks = [
-                matchup.other_hero
-                for matchup in matchup_qs
-                    .order_by('-advantage')
-                    [:settings.AUTOMATCHUP_TOP_COUNT]
-            ]
-            calculated_matchups.extend(counterpicks)
-
-        if self.auto_stomp:
-            stomps = [
-                matchup.other_hero
-                for matchup in matchup_qs
-                    .order_by('advantage')
-                    [:settings.AUTOMATCHUP_TOP_COUNT]
-            ]
-            calculated_matchups.extend(stomps)
-
-        if self.auto_meta:
+        if self.add_all_mids:
+            midlaners = Hero.objects.lane_occupants('mid')
             calculated_matchups.extend(midlaners)
 
-        calculated_matchups = set(calculated_matchups)
-        self.total_matchups.set(calculated_matchups)
+        if self.add_counters:
+            calculated_matchups.extend(self.hero.counters.all())
+
+        if self.add_easy_lanes:
+            calculated_matchups.extend(self.hero.easy_lanes.all())
+
+        return set(calculated_matchups)
