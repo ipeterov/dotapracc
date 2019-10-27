@@ -66,9 +66,13 @@ class Mutations(graphene.ObjectType):
 class Query(graphene.ObjectType):
     viewer = graphene.Field(UserType)
     all_heroes = graphene.List(HeroType)
+    midlaners = graphene.List(HeroType)
 
     def resolve_viewer(self, info, **kwargs):
         return info.context.user
 
     def resolve_all_heroes(self, info, **kwargs):
         return Hero.objects.all()
+
+    def resolve_midlaners(self, info, **kwargs):
+        return Hero.objects.lane_occupants('mid')

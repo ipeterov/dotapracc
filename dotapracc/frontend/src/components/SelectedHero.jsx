@@ -6,7 +6,7 @@ import gql from 'graphql-tag';
 
 import {
   Card, CardContent, Grid, GridList, GridListTile, CardHeader, Avatar,
-  IconButton, Typography, CircularProgress,
+  IconButton, Typography, CircularProgress, Button, ButtonGroup,
 } from "@material-ui/core";
 import CloseIcon from '@material-ui/icons/Close';
 
@@ -58,7 +58,7 @@ class SelectedHero extends React.Component {
     };
   }
 
-  getMatchupArray(matchups) {
+  getIdArray(matchups) {
     const matchupArray = [];
     matchups.forEach(matchupDict => {
       matchupArray.push(matchupDict.id);
@@ -66,30 +66,15 @@ class SelectedHero extends React.Component {
     return matchupArray;
   }
 
-  handleHeroClick(heroId) {
-    return () => {
-      const selectedHero = _.cloneDeep(this.props.selectedHero);
-
-      if (selectedHero.matchups.some(elem => elem.id === heroId)) {
-        _.remove(selectedHero.matchups, elem => elem.id === heroId);
-      } else {
-        selectedHero.matchups.push({ id: heroId, __typename: 'HeroType' });
-      }
-
-        this.props.mutate({
-          variables: {
-            heroId: selectedHero.hero.id,
-            matchupIds: this.getMatchupArray(selectedHero.matchups),
-          },
-          optimisticResponse: {
-            __typename: 'Mutation',
-            updateOrCreateSelectedHero: {
-              __typename: 'UpdateOrCreateSelectedHero',
-              selectedHero,
-            }
-          }
-        });
-    };
+  getHeroesByAttr(heroes) {
+    const heroesByAttr = { STR: [], AGI: [], INT: [] };
+    heroes.forEach(hero => {
+      heroesByAttr[hero.primaryAttribute].push(hero);
+    });
+    [STR, AGI, INT].forEach(attr => {
+      heroesByAttr[attr] = _.sortBy(heroesByAttr[attr], ['name'])
+    });
+    return heroesByAttr;
   }
 
   getGreyscaleStyle(heroId, matchups) {
@@ -103,19 +88,52 @@ class SelectedHero extends React.Component {
     return { filter: `grayscale(${greyscalePercent}%)` }
   }
 
+  setHeroes(selectedHero, heroIds) {
+    this.props.mutate({
+      variables: {
+        heroId: selectedHero.hero.id,
+        matchupIds: heroIds,
+      },
+      optimisticResponse: {
+        __typename: 'Mutation',
+        updateOrCreateSelectedHero: {
+          __typename: 'UpdateOrCreateSelectedHero',
+          selectedHero,
+        }
+      }
+    });
+  }
+
+  toggleHeroes(heroIds) {
+    return () => {
+      const selectedHero = _.cloneDeep(this.props.selectedHero);
+      const matchups = this.getIdArray(selectedHero.matchups);
+
+      let newMatchups;
+      if (_.difference(heroIds, matchups).length) {
+        newMatchups = _.union(matchups, heroIds);
+      } else {
+        newMatchups = _.difference(matchups, heroIds);
+      }
+
+      selectedHero.matchups = newMatchups.map(
+        heroId => ({ id: heroId, __typename: 'HeroType' })
+      );
+
+      this.setHeroes(selectedHero, this.getIdArray(selectedHero.matchups));
+    };
+  }
+
   render() {
     const { selectedHero, allHeroes } = this.props;
-    const { id, primaryAttribute, attackType, name } = selectedHero.hero;
+    const { primaryAttribute, attackType, name } = selectedHero.hero;
 
-    const heroesByAttr = { STR: [], AGI: [], INT: [] };
-    allHeroes.forEach(hero => {
-      heroesByAttr[hero.primaryAttribute].push(hero);
-    });
-    [STR, AGI, INT].forEach(attr => {
-      heroesByAttr[attr] = _.sortBy(heroesByAttr[attr], ['name'])
-    });
+    const matchups = this.getIdArray(selectedHero.matchups);
+    const midlaners = this.getIdArray(this.props.midlaners);
+    const counters = this.getIdArray(selectedHero.hero.counters);
+    const easyLanes = this.getIdArray(selectedHero.hero.easyLanes);
 
-    const matchups = this.getMatchupArray(selectedHero.matchups);
+    const heroesByAttr = this.getHeroesByAttr(allHeroes);
 
     return (
       <Grid item xs={12}>
@@ -124,7 +142,7 @@ class SelectedHero extends React.Component {
             avatar={
               <Avatar
                 src={'media/' + selectedHero.hero.picture}
-                style={{ width: '60px', height: '60px' }}
+                style={{ width: '80px', height: '80px' }}
               />
             }
             action={
@@ -158,9 +176,9 @@ class SelectedHero extends React.Component {
                 {heroesByAttr[attribute].map(hero => (
                   <GridListTile
                     key={hero.picture}
-                    onMouseDown={this.handleHeroClick(hero.id)}
-                    onMouseEnter={() => this.setState({highlightedHeroId: hero.id})}
-                    onMouseLeave={() => this.setState({highlightedHeroId: null})}
+                    onMouseDown={this.toggleHeroes([hero.id])}
+                    onMouseEnter={() => this.setState({ highlightedHeroId: hero.id })}
+                    onMouseLeave={() => this.setState({ highlightedHeroId: null })}
                   >
                     <img
                       src={'media/' + hero.picture}
@@ -171,6 +189,22 @@ class SelectedHero extends React.Component {
                 ))}
               </GridList>
             ))}
+            <Grid container justify="center">
+              <ButtonGroup variant="text" size="medium">
+                <Button onClick={this.toggleHeroes(midlaners)}>
+                  Toggle all mids
+                </Button>
+                <Button onClick={this.toggleHeroes(counters)}>
+                  Toggle counters
+                </Button>
+                <Button onClick={this.toggleHeroes(easyLanes)}>
+                  Toggle easy lanes
+                </Button>
+                <Button onClick={() => {this.setHeroes(selectedHero,[])}}>
+                  Clear
+                </Button>
+              </ButtonGroup>
+            </Grid>
           </CardContent>
         </Card>
       </Grid>
@@ -181,6 +215,7 @@ class SelectedHero extends React.Component {
 SelectedHero.propTypes = {
   selectedHero: PropTypes.object.isRequired,
   allHeroes: PropTypes.array.isRequired,
+  midlaners: PropTypes.array.isRequired,
   mutate: PropTypes.func.isRequired,
   handleDelete: PropTypes.func.isRequired,
   deleting: PropTypes.bool.isRequired,

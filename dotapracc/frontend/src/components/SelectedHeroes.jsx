@@ -27,6 +27,7 @@ const QUERY = gql`
       picture
       primaryAttribute
     }
+    midlaners { id }
   }
   ${SELECTED_HERO_FRAGMENT}
 `;
@@ -124,6 +125,7 @@ class SelectedHeroes extends React.Component {
             <SelectedHero
               selectedHero={selectedHero}
               allHeroes={data.allHeroes}
+              midlaners={data.midlaners}
               handleDelete={this.handleDelete}
               deleting={this.state.deleting.includes(selectedHero.id)}
               key={selectedHero.id}
