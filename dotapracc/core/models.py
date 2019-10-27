@@ -34,10 +34,10 @@ class Hero(models.Model):
         null=True, blank=True,
     )
 
-    primary_attribute = models.CharField(max_length=3, choices=(
-        ('str', 'Strength'),
-        ('int', 'Intellect'),
-        ('agi', 'Agility'),
+    primary_attribute = models.CharField(max_length=9, choices=(
+        ('Strength', 'Strength'),
+        ('Intellect', 'Intellect'),
+        ('Agility', 'Agility'),
     ))
     attack_type = models.CharField(max_length=6, choices=(
         ('Melee', 'Melee'),

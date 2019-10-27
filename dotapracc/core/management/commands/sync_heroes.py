@@ -21,6 +21,11 @@ class Command(BaseCommand):
 
             name = raw_hero['localized_name']
             picture = self.odota_api.get_hero_picture(name)
+            primary_attr = {
+                'str': 'Strength',
+                'agi': 'Agility',
+                'int': 'Intellect',
+            }[raw_hero['primary_attr']]
 
             print(f'Updating or creating {name}...')
             hero, created = Hero.objects.update_or_create(
@@ -28,7 +33,7 @@ class Command(BaseCommand):
                 opendota_id=raw_hero['id'],
                 defaults={
                     'picture': picture,
-                    'primary_attribute': raw_hero['primary_attr'],
+                    'primary_attribute': primary_attr,
                     'attack_type': raw_hero['attack_type'],
                 }
             )

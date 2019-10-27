@@ -44,10 +44,6 @@ export const UPDATE_OR_CREATE_SELECTED_HERO = gql`
   ${SELECTED_HERO_FRAGMENT}
 `;
 
-const STR = 'STR';
-const AGI = 'AGI';
-const INT = 'INT';
-
 
 class SelectedHero extends React.Component {
   constructor(props) {
@@ -67,11 +63,11 @@ class SelectedHero extends React.Component {
   }
 
   getHeroesByAttr(heroes) {
-    const heroesByAttr = { STR: [], AGI: [], INT: [] };
+    const heroesByAttr = { STRENGTH: [], AGILITY: [], INTELLECT: [] };
     heroes.forEach(hero => {
       heroesByAttr[hero.primaryAttribute].push(hero);
     });
-    [STR, AGI, INT].forEach(attr => {
+    ['STRENGTH', 'AGILITY', 'INTELLECT'].forEach(attr => {
       heroesByAttr[attr] = _.sortBy(heroesByAttr[attr], ['name'])
     });
     return heroesByAttr;
@@ -165,7 +161,7 @@ class SelectedHero extends React.Component {
             <Typography variant={'overline'}>
               Will match with:
             </Typography>
-            {[STR, AGI, INT].map(attribute => (
+            {['STRENGTH', 'AGILITY', 'INTELLECT'].map(attribute => (
               <GridList
                 key={attribute}
                 spacing={1}
@@ -199,6 +195,12 @@ class SelectedHero extends React.Component {
                 </Button>
                 <Button onClick={this.toggleHeroes(easyLanes)}>
                   Toggle easy lanes
+                </Button>
+                <Button onClick={() => {
+                  const ids = this.getIdArray(allHeroes);
+                  this.setHeroes(selectedHero,ids)}
+                }>
+                  Add all
                 </Button>
                 <Button onClick={() => {this.setHeroes(selectedHero,[])}}>
                   Clear
