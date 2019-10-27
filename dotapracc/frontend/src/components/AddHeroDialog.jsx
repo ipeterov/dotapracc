@@ -28,8 +28,8 @@ export default function AddHeroDialog({ allHeroes, handleAdd }) {
       <Dialog open={open} onClose={handleClose}>
         <DialogContent>
           <DialogContentText>
-            To subscribe to this website, please enter your email address here.
-            We will send updates occasionally.
+            Add a hero to your matching profile. You will only get matches
+            with people who want to play against your heroes.
           </DialogContentText>
           <FormControl>
             <InputLabel>Hero</InputLabel>

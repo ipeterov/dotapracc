@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import React from 'react';
 import autoBind from 'react-autobind';
 import PropTypes from 'prop-types';
@@ -41,29 +42,52 @@ class SelectedHeroes extends React.Component {
   constructor(props) {
     super(props);
     autoBind(this);
+
+    this.state = {
+      adding: false,
+      deleting: [],
+    };
   }
 
   handleAdd(heroId) {
-    this.props.updateOrCreate({
-      variables: {
-        heroId,
-        matchupIds: [],
-      },
-      refetchQueries: [
-        { query: QUERY }
-      ]
-    });
+    this.setState({ adding: true },
+      () => {
+        this.props.updateOrCreate({
+          variables: {
+            heroId,
+            matchupIds: [],
+          },
+          refetchQueries: [
+            { query: QUERY },
+          ],
+          awaitRefetchQueries: true,
+        }).then(() => {
+          this.setState({ adding: false });
+        });
+      }
+    );
   }
 
   handleDelete(selectedHeroId) {
-    this.props.delete({
-      variables: {
-        selectedHeroId: selectedHeroId
+    this.setState(
+      {deleting: this.state.deleting.concat([selectedHeroId])},
+      () => {
+        this.props.delete({
+          variables: {
+            selectedHeroId: selectedHeroId
+          },
+          refetchQueries: [
+            { query: QUERY }
+          ]
+        }).then(() => {
+          const newDeleting = _.filter(
+            this.state.deleting,
+            id => id !== selectedHeroId,
+          );
+          this.setState({ deleting: newDeleting });
+        });
       },
-      refetchQueries: [
-        { query: QUERY }
-      ]
-    });
+    );
   }
 
   render() {
@@ -71,7 +95,11 @@ class SelectedHeroes extends React.Component {
     const { loading, error } = data;
 
     if (error) return <p>Error :(</p>;
-    if (loading) return <CircularProgress />;
+    if (loading) return (
+      <Grid container justify="center">
+        <CircularProgress />
+      </Grid>
+    );
 
     return (
       <Grid container spacing={2}>
@@ -87,9 +115,19 @@ class SelectedHeroes extends React.Component {
               selectedHero={selectedHero}
               allHeroes={data.allHeroes}
               handleDelete={this.handleDelete}
+              deleting={this.state.deleting.includes(selectedHero.id)}
               key={selectedHero.id}
             />
           ))
+        }
+        {
+          this.state.adding && (
+            <Grid item xs={12}>
+              <Grid container justify="center">
+                <CircularProgress />
+              </Grid>
+            </Grid>
+          )
         }
       </Grid>
     );

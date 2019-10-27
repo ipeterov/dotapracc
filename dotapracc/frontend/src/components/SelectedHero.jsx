@@ -6,7 +6,7 @@ import gql from 'graphql-tag';
 
 import {
   Card, CardContent, Grid, GridList, GridListTile, CardHeader, Avatar,
-  IconButton, Typography
+  IconButton, Typography, CircularProgress,
 } from "@material-ui/core";
 import CloseIcon from '@material-ui/icons/Close';
 
@@ -50,6 +50,14 @@ const INT = 'INT';
 
 
 class SelectedHero extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      highlightedHeroId: null
+    };
+  }
+
   getMatchupArray(matchups) {
     const matchupArray = [];
     matchups.forEach(matchupDict => {
@@ -84,6 +92,17 @@ class SelectedHero extends React.Component {
     };
   }
 
+  getGreyscaleStyle(heroId, matchups) {
+    const highlighted = this.state.highlightedHeroId === heroId;
+    let greyscalePercent;
+    if (matchups.includes(heroId)) {
+      greyscalePercent = highlighted ? 30: 0;
+    } else {
+      greyscalePercent = highlighted ? 70: 100;
+    }
+    return { filter: `grayscale(${greyscalePercent}%)` }
+  }
+
   render() {
     const { selectedHero, allHeroes } = this.props;
     const { id, primaryAttribute, attackType, name } = selectedHero.hero;
@@ -109,11 +128,15 @@ class SelectedHero extends React.Component {
               />
             }
             action={
-              <IconButton onClick={
-                () => this.props.handleDelete(selectedHero.id)
-              }>
-                <CloseIcon />
-              </IconButton>
+              <div>
+                <IconButton onClick={
+                  () => this.props.handleDelete(selectedHero.id)
+                }>
+                  {this.props.deleting ?
+                    <CircularProgress size={24} /> : <CloseIcon />
+                  }
+                </IconButton>
+              </div>
             }
             title={name}
             titleTypographyProps={{ variant: 'h5' }}
@@ -130,20 +153,19 @@ class SelectedHero extends React.Component {
                 spacing={1}
                 cols={15}
                 cellHeight={44}
-                style={{ marginBottom: '10px' }}
+                style={{ marginBottom: '8px' }}
               >
                 {heroesByAttr[attribute].map(hero => (
                   <GridListTile
                     key={hero.picture}
                     onMouseDown={this.handleHeroClick(hero.id)}
+                    onMouseEnter={() => this.setState({highlightedHeroId: hero.id})}
+                    onMouseLeave={() => this.setState({highlightedHeroId: null})}
                   >
                     <img
                       src={'media/' + hero.picture}
                       alt={hero.name}
-                      style={
-                        matchups.includes(hero.id) ?
-                        {} : { filter: 'grayscale(100%)' }
-                      }
+                      style={this.getGreyscaleStyle(hero.id, matchups)}
                     />
                   </GridListTile>
                 ))}
@@ -161,6 +183,7 @@ SelectedHero.propTypes = {
   allHeroes: PropTypes.array.isRequired,
   mutate: PropTypes.func.isRequired,
   handleDelete: PropTypes.func.isRequired,
+  deleting: PropTypes.bool.isRequired,
 };
 
 export default graphql(UPDATE_OR_CREATE_SELECTED_HERO)(SelectedHero)
