@@ -6,7 +6,7 @@ import { graphql } from '@apollo/react-hoc';
 import { compose } from 'recompose';
 import gql from 'graphql-tag'
 
-import { Grid, CircularProgress } from "@material-ui/core";
+import { Grid, CircularProgress, Typography } from "@material-ui/core";
 
 import SelectedHero, {
   SELECTED_HERO_FRAGMENT, UPDATE_OR_CREATE_SELECTED_HERO,
@@ -109,6 +109,16 @@ class SelectedHeroes extends React.Component {
             allHeroes={data.allHeroes}
           />
         </Grid>
+        {
+          data.viewer.selectedHeroes.length === 0 && (
+            <Grid item xs={12}>
+              <Typography>
+                You don't have any heroes selected. To be able to find a match,
+                add a few heroes.
+              </Typography>
+            </Grid>
+          )
+        }
         {
           data.viewer.selectedHeroes.map((selectedHero) => (
             <SelectedHero
