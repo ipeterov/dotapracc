@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand
+from django.core.files.base import ContentFile
 from django.db import transaction
 
 from ...models import Hero, HeroMatchup
@@ -18,10 +19,18 @@ class Command(BaseCommand):
             if raw_hero['id'] in existing_hero_ids:
                 continue
 
-            print(f'Creating {raw_hero["localized_name"]}...')
-            hero = Hero.objects.create(
-                name=raw_hero['localized_name'],
+            name = raw_hero['localized_name']
+            picture = self.odota_api.get_hero_picture(name)
+
+            print(f'Updating or creating {name}...')
+            hero, created = Hero.objects.update_or_create(
+                name=name,
                 opendota_id=raw_hero['id'],
+                defaults={
+                    'picture': picture,
+                    'primary_attribute': raw_hero['primary_attr'],
+                    'attack_type': raw_hero['attack_type'],
+                }
             )
             heroes.append(hero)
             existing_hero_ids.add(hero.opendota_id)
@@ -84,4 +93,5 @@ class Command(BaseCommand):
         self.import_meta(heroes)
         self.import_matchups(heroes)
         for hero in heroes:
+            print(f'Recalculating counters for {hero.name}...')
             hero.update_matchups()

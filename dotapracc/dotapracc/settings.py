@@ -56,6 +56,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'dotapracc.urls'
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -149,8 +152,30 @@ GRAPHENE = {
 }
 
 
-OPENDOTA_API_URL = 'https://api.opendota.com/api/'
+OPENDOTA_API_URL = 'https://api.opendota.com/'
+OPENDOTA_PUBLIC_API_URL = f'{OPENDOTA_API_URL}api/'
 OPENDOTA_API_KEY = 'fb3453ae-3631-49a9-b719-8681d4156fa8'
+OPENDOTA_IRREGULAR_NAMES = {
+    'io': 'wisp',
+    'clockwerk': 'rattletrap',
+    'doom': 'doom_bringer',
+    'lifestealer': 'life_stealer',
+    'magnus': 'magnataur',
+    'necrophos': 'necrolyte',
+    'timbersaw': 'shredder',
+    'underlord': 'abyssal_underlord',
+    'windranger': 'windrunner',
+    'zeus': 'zuus',
+    'anti_mage': 'antimage',
+    'centaur_warrunner': 'centaur',
+    'natures_prophet': 'furion',
+    'outworld_devourer': 'obsidian_destroyer',
+    'queen_of_pain': 'queenofpain',
+    'shadow_fiend': 'nevermore',
+    'treant_protector': 'treant',
+    'vengeful_spirit': 'vengefulspirit',
+    'wraith_king': 'skeleton_king',
+}
 
 DOTABUFF_URL = 'https://dotabuff.com/'
 DOTABUFF_SCRAPE_USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'

@@ -25,11 +25,24 @@ class Hero(models.Model):
     }
 
     name = models.CharField(max_length=64)
+
     opendota_id = models.IntegerField(unique=True)
+    picture = models.ImageField(upload_to='hero_images')
+
     aliases = ArrayField(
         models.CharField(max_length=64, null=True, blank=True),
         null=True, blank=True,
     )
+
+    primary_attribute = models.CharField(max_length=3, choices=(
+        ('str', 'Strength'),
+        ('int', 'Intellect'),
+        ('agi', 'Agility'),
+    ))
+    attack_type = models.CharField(max_length=6, choices=(
+        ('Melee', 'Melee'),
+        ('Ranged', 'Ranged'),
+    ))
 
     midlane_presence = models.FloatField(default=0)
     safelane_presence = models.FloatField(default=0)
@@ -86,29 +99,9 @@ class SelectedHero(models.Model):
         Hero, on_delete=models.CASCADE, related_name='+',
     )
 
-    add_all_mids = models.BooleanField()
-    add_counters = models.BooleanField()
-    add_easy_lanes = models.BooleanField()
-
-    wanted_matchups = models.ManyToManyField(
+    matchups = models.ManyToManyField(
         Hero, blank=True, related_name='+',
     )
 
     def __str__(self):
         return f'{self.user.username} is training {self.hero}'
-
-    def calculate_matchups(self):
-        calculated_matchups = []
-        calculated_matchups.extend(self.wanted_matchups.all())
-
-        if self.add_all_mids:
-            midlaners = Hero.objects.lane_occupants('mid')
-            calculated_matchups.extend(midlaners)
-
-        if self.add_counters:
-            calculated_matchups.extend(self.hero.counters.all())
-
-        if self.add_easy_lanes:
-            calculated_matchups.extend(self.hero.easy_lanes.all())
-
-        return set(calculated_matchups)

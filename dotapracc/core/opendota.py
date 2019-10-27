@@ -4,6 +4,8 @@ import requests
 from requests.compat import urljoin
 
 from django.conf import settings
+from django.core.files.base import ContentFile
+from django.utils.text import slugify
 
 
 # https://www.evanmiller.org/how-not-to-sort-by-average-rating.html
@@ -24,8 +26,9 @@ def wilson_score(up, down):
 
 class OpenDotaAPI:
     def __init__(self):
-        self.api_url=settings.OPENDOTA_API_URL
-        self.api_key=settings.OPENDOTA_API_KEY
+        self.raw_api_url = settings.OPENDOTA_API_URL
+        self.api_url = settings.OPENDOTA_PUBLIC_API_URL
+        self.api_key = settings.OPENDOTA_API_KEY
 
     def get(self, url: str, params: dict = None):
         if params is None:
@@ -47,3 +50,13 @@ class OpenDotaAPI:
             matchup['advantage'] = wilson_score(wins, losses) * 100
 
         return matchups
+
+    def get_hero_picture(self, full_name):
+        name = slugify(full_name).replace('-', '_')
+        if name in settings.OPENDOTA_IRREGULAR_NAMES:
+            name = settings.OPENDOTA_IRREGULAR_NAMES[name]
+
+        api = self.raw_api_url
+        url = urljoin(api, f'apps/dota2/images/heroes/{name}_full.png')
+        raw_data = requests.get(url).content
+        return ContentFile(raw_data, name=f'{name}.png')

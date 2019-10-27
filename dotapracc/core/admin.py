@@ -14,14 +14,6 @@ class HeroAdmin(admin.ModelAdmin):
     list_per_page = 200
 
 
-class SelectedHeroAdmin(admin.ModelAdmin):
-    model = SelectedHero
-
-    def save_related(self, request, form, formsets, change):
-        super().save_related(request, form, formsets, change)
-        form.instance.calculate_matchups()
-
-
 admin.site.register(Hero, HeroAdmin)
 admin.site.register(HeroMatchup, HeroMatchupAdmin)
-admin.site.register(SelectedHero, SelectedHeroAdmin)
+admin.site.register(SelectedHero)
