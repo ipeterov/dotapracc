@@ -77,14 +77,20 @@ class SelectedHero extends React.Component {
     const highlighted = this.state.highlightedHeroId === heroId;
     let greyscalePercent;
     if (matchups.includes(heroId)) {
-      greyscalePercent = highlighted ? 30: 0;
+      greyscalePercent = highlighted ? 25: 0;
     } else {
-      greyscalePercent = highlighted ? 70: 100;
+      greyscalePercent = highlighted ? 75: 100;
     }
     return { filter: `grayscale(${greyscalePercent}%)` }
   }
 
-  setHeroes(selectedHero, heroIds) {
+  setHeroes(selectedHeroOriginal, heroIds) {
+    const selectedHero = _.cloneDeep(selectedHeroOriginal);
+
+    selectedHero.matchups = heroIds.map(
+      heroId => ({ id: heroId, __typename: 'HeroType' })
+    );
+
     this.props.mutate({
       variables: {
         heroId: selectedHero.hero.id,
@@ -102,8 +108,7 @@ class SelectedHero extends React.Component {
 
   toggleHeroes(heroIds) {
     return () => {
-      const selectedHero = _.cloneDeep(this.props.selectedHero);
-      const matchups = this.getIdArray(selectedHero.matchups);
+      const matchups = this.getIdArray(this.props.selectedHero.matchups);
 
       let newMatchups;
       if (_.difference(heroIds, matchups).length) {
@@ -112,11 +117,7 @@ class SelectedHero extends React.Component {
         newMatchups = _.difference(matchups, heroIds);
       }
 
-      selectedHero.matchups = newMatchups.map(
-        heroId => ({ id: heroId, __typename: 'HeroType' })
-      );
-
-      this.setHeroes(selectedHero, this.getIdArray(selectedHero.matchups));
+      this.setHeroes(this.props.selectedHero, newMatchups);
     };
   }
 
@@ -196,6 +197,8 @@ class SelectedHero extends React.Component {
                 <Button onClick={this.toggleHeroes(easyLanes)}>
                   Toggle easy lanes
                 </Button>
+              </ButtonGroup>
+              <ButtonGroup variant="text" size="medium">
                 <Button onClick={() => {
                   const ids = this.getIdArray(allHeroes);
                   this.setHeroes(selectedHero,ids)}
