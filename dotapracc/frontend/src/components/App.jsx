@@ -7,7 +7,7 @@ import Base from './Base.jsx'
 
 
 const client = new ApolloClient({
-  uri: 'http://localhost:8000/gql/',
+  uri: 'http://dotapra.cc/gql/',
 });
 
 class App extends React.Component {

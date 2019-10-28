@@ -25,7 +25,7 @@ SECRET_KEY = '8l6h3bm&2_o2pjj295f(u*f+572mhdv#ds)y*+qr5t=7ca1=1t'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['dotapra.cc']
 
 # Application definition
 
