@@ -16,9 +16,6 @@ class Command(BaseCommand):
         heroes = list(Hero.objects.all())
         existing_hero_ids = {hero.opendota_id for hero in heroes}
         for raw_hero in raw_heroes:
-            if raw_hero['id'] in existing_hero_ids:
-                continue
-
             name = raw_hero['localized_name']
             picture = self.odota_api.get_hero_picture(name)
             primary_attr = {
