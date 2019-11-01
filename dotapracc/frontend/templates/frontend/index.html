@@ -9,6 +9,10 @@
         <div id="app"><!-- React --></div>
     </body>
     {% load static %}
-    <script src="{% static "frontend/main.js" %}"></script>
+    {% if settings.DEBUG %}
+        <script src="{% static "frontend/main.js" %}"></script>
+    {% else %}
+        <script src="{% static "frontend/main-prod.js" %}"></script>
+    {% endif %}
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
 </html>

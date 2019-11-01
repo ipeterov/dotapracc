@@ -1,0 +1,21 @@
+version: '3.7'
+
+services:
+  web:
+    container_name: dotapracc_web
+    build: .
+    command: gunicorn --chdir dotapracc --bind :8000 dotapracc.wsgi:application
+    expose:
+      - 8000
+    environment:
+      - DJANGO_SETTINGS_MODULE=dotapracc.settings.prod
+
+  nginx:
+    container_name: dotapracc_nginx
+    image: nginx:latest
+    ports:
+      - 8000:8000
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+    depends_on:
+      - web

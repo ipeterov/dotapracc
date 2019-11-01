@@ -1,0 +1,12 @@
+version: '3.7'
+
+services:
+  web:
+    build: .
+    command: /bin/bash  # runserver и npm start запускаются из pycharm
+    volumes:
+      - .:/code/
+    ports:
+      - 8000:8000
+    environment:
+      - DJANGO_SETTINGS_MODULE=dotapracc.settings.dev
