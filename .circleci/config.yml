@@ -33,6 +33,9 @@ jobs:
           command: ssh-keyscan -H dotapra.cc >> ~/.ssh/known_hosts
       - run:
           name: Deploy to Scaleway
+          environment:
+            DOCKER_CLIENT_TIMEOUT: 120
+            COMPOSE_HTTP_TIMEOUT: 120
           command: |
             set -x
             docker login rg.fr-par.scw.cloud/ipeterov -u nologin -p "$DOCKER_REGISTRY_TOKEN"
