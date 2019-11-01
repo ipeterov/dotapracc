@@ -25,9 +25,8 @@ jobs:
             docker push rg.fr-par.scw.cloud/$WEB_IMAGE_NAME:latest
             docker push rg.fr-par.scw.cloud/$NGINX_IMAGE_NAME:latest
   deploy:
-    machine:
-      enabled: true
-    working_directory: ~/circlece-demo-workflows
+    docker:
+      - image: circleci/buildpack-deps:stretch
     environment:
       DOCKER_HOST: ssh://root@dotapra.cc
     steps:
