@@ -39,6 +39,7 @@ jobs:
           name: Deploy to Scaleway
           command: |
             set -x
+            docker login rg.fr-par.scw.cloud/ipeterov -u nologin -p "$DOCKER_REGISTRY_TOKEN"
             docker-compose -H ssh://root@dotapra.cc pull
             docker-compose -H ssh://root@dotapra.cc up -d
 
