@@ -27,8 +27,6 @@ jobs:
   deploy:
     docker:
       - image: circleci/buildpack-deps:stretch
-    environment:
-      DOCKER_HOST: ssh://root@dotapra.cc
     steps:
       - checkout
       - setup_remote_docker:
@@ -37,8 +35,8 @@ jobs:
           name: Deploy to Scaleway
           command: |
             set -x
-            docker-compose pull
-            docker-compose up -d
+            docker-compose -H ssh://root@dotapra.cc pull
+            docker-compose -H ssh://root@dotapra.cc up -d
 
 workflows:
   version: 2
