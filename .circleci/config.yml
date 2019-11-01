@@ -1,18 +1,32 @@
-# Python CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-python/ for more details
-#
 version: 2
-jobs:
-  build:
-    working_directory: ~/dotapracc
+  jobs:
+    build:
+      docker:
+        - image: circleci/buildpack-deps:stretch
+      steps:
+        - checkout
+        - setup_remote_docker
 
-    steps:
-      - checkout
-      - run:
-          name: Start container and verify it is working
-          command: |
-            set -x
-            docker-compose up -d
-            docker run --network container:contacts \
-              appropriate/curl --retry 10 --retry-delay 1 --retry-connrefused http://localhost:8080/contacts/test
+        - run:
+            name: Build web
+            command: docker build -t $WEB_IMAGE_NAME:latest .
+
+        - run:
+            name: Build nginx
+            command: docker build -t $NGINX_IMAGE_NAME:latest .
+
+        - run:
+            name: Publish images
+            command: |
+              docker login rg.fr-par.scw.cloud/ipeterov -u nologin -p "DOCKER_REGISTRY_TOKEN"
+              docker push $WEB_IMAGE_NAME:latest
+              docker push $NGINX_IMAGE_NAME:latest
+
+  workflows:
+    version: 2
+    build-master:
+      jobs:
+        - build:
+            filters:
+              branches:
+                only: master

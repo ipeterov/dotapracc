@@ -12,10 +12,10 @@ services:
 
   nginx:
     container_name: dotapracc_nginx
-    image: nginx:latest
+    build:
+      context: .
+      dockerfile: Dockerfile-nginx
     ports:
       - 8000:8000
-    volumes:
-      - ./nginx:/etc/nginx/conf.d
     depends_on:
       - web
