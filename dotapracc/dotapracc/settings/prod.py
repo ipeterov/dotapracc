@@ -25,7 +25,7 @@ SECRET_KEY = '8l6h3bm&2_o2pjj295f(u*f+572mhdv#ds)y*+qr5t=7ca1=1t'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['dotapra.cc']
+ALLOWED_HOSTS = ['localhost', 'dotapra.cc']
 
 # Application definition
 
@@ -178,6 +178,10 @@ OPENDOTA_IRREGULAR_NAMES = {
 }
 
 DOTABUFF_URL = 'https://dotabuff.com/'
-DOTABUFF_SCRAPE_USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'
+DOTABUFF_SCRAPE_USER_AGENT = (
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) '
+    'AppleWebKit/537.36 (KHTML, like Gecko) '
+    'Chrome/39.0.2171.95 Safari/537.36'
+)
 
 TOP_N_MATCHUPS = 5
