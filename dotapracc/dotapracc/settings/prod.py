@@ -1,8 +1,8 @@
 from .base import *
 
 
-DEBUG = True
-ALLOWED_HOSTS = ['dotapra.cc']
+DEBUG = False
+ALLOWED_HOSTS = ['web']  # Адрес контейнера - его имя
 STATIC_ROOT = os.path.join(BASE_DIR, '../static')
 
 # Database

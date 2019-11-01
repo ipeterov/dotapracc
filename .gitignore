@@ -275,3 +275,4 @@ sftp-config.json
 .vscode/
 
 media/
+static/

@@ -7,7 +7,7 @@ WORKDIR /code
 COPY requirements.txt /code/
 RUN pip install -r requirements.txt
 
-COPY ./dotapracc/ /code/
+COPY . /code/
 
 RUN npm install --global webpack
 RUN npm run build

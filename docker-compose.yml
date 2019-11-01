@@ -10,6 +10,14 @@ services:
       - 8000
     environment:
       - DJANGO_SETTINGS_MODULE=dotapracc.settings.prod
+    volumes:
+      - type: volume
+        source: static
+        target: /code/dotapracc/static
+
+      - type: volume
+        source: media
+        target: /code/dotapracc/media
 
   nginx:
     image: rg.fr-par.scw.cloud/ipeterov/dotapracc-nginx:latest
@@ -18,6 +26,18 @@ services:
       context: .
       dockerfile: Dockerfile-nginx
     ports:
-      - 8000:8000
+      - 80:80
     depends_on:
       - web
+    volumes:
+      - type: volume
+        source: static
+        target: /code/dotapracc/static
+
+      - type: volume
+        source: media
+        target: /code/dotapracc/media
+
+volumes:
+   static:
+   media:
