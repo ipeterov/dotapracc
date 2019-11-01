@@ -12,11 +12,11 @@ jobs:
 
       - run:
           name: Build web
-          command: docker build -t $WEB_IMAGE_NAME:latest .
+          command: docker build -t rg.fr-par.scw.cloud/$WEB_IMAGE_NAME:latest .
 
       - run:
           name: Build nginx
-          command: docker build -t $NGINX_IMAGE_NAME:latest .
+          command: docker build -t rg.fr-par.scw.cloud/$NGINX_IMAGE_NAME:latest .
 
       - run:
           name: Publish images
