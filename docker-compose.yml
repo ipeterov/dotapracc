@@ -2,6 +2,7 @@ version: '3.2'
 
 services:
   web:
+    image: rg.fr-par.scw.cloud/ipeterov/dotapracc-web:latest
     container_name: dotapracc_web
     build: .
     command: gunicorn --chdir dotapracc --bind :8000 dotapracc.wsgi:application
@@ -11,6 +12,7 @@ services:
       - DJANGO_SETTINGS_MODULE=dotapracc.settings.prod
 
   nginx:
+    image: rg.fr-par.scw.cloud/ipeterov/dotapracc-nginx:latest
     container_name: dotapracc_nginx
     build:
       context: .
