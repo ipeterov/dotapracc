@@ -24,6 +24,20 @@ jobs:
             docker login rg.fr-par.scw.cloud/ipeterov -u nologin -p "$DOCKER_REGISTRY_TOKEN"
             docker push rg.fr-par.scw.cloud/$WEB_IMAGE_NAME:latest
             docker push rg.fr-par.scw.cloud/$NGINX_IMAGE_NAME:latest
+  deploy:
+    machine:
+      enabled: true
+    working_directory: ~/circlece-demo-workflows
+    environment:
+      DOCKER_HOST: ssh://root@dotapra.cc
+    steps:
+      - checkout
+      - run:
+          name: Deploy to Scaleway
+          command: |
+            set -x
+            docker-compose pull
+            docker-compose up -d
 
 workflows:
   version: 2

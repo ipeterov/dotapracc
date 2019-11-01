@@ -12,6 +12,3 @@ COPY . /code/
 RUN npm install --global webpack
 RUN npm run build
 RUN python dotapracc/manage.py collectstatic --no-input --settings dotapracc.settings.prod
-
-EXPOSE 8000
-EXPOSE 8001
