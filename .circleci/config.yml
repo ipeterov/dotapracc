@@ -22,8 +22,8 @@ jobs:
           name: Publish images
           command: |
             docker login rg.fr-par.scw.cloud/ipeterov -u nologin -p "$DOCKER_REGISTRY_TOKEN"
-            docker push $WEB_IMAGE_NAME:latest
-            docker push $NGINX_IMAGE_NAME:latest
+            docker push rg.fr-par.scw.cloud/$WEB_IMAGE_NAME:latest
+            docker push rg.fr-par.scw.cloud/$NGINX_IMAGE_NAME:latest
 
 workflows:
   version: 2
