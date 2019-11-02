@@ -11,13 +11,8 @@ services:
     environment:
       - DJANGO_SETTINGS_MODULE=dotapracc.settings.prod
     volumes:
-      - type: volume
-        source: static
-        target: /code/dotapracc/static
-
-      - type: volume
-        source: media
-        target: /code/dotapracc/media
+      - "static:/code/dotapracc/static"
+      - "media:/code/dotapracc/media"
 
   nginx:
     image: rg.fr-par.scw.cloud/ipeterov/dotapracc-nginx:latest
@@ -33,11 +28,17 @@ services:
       - type: volume
         source: static
         target: /code/dotapracc/static
+        read_only: true
+        volume:
+          nocopy: true
 
       - type: volume
         source: media
         target: /code/dotapracc/media
+        read_only: true
+        volume:
+          nocopy: true
 
 volumes:
-   static:
-   media:
+  static:
+  media:

@@ -6,9 +6,9 @@ import ApolloClient from 'apollo-boost';
 import Base from './Base.jsx'
 
 
-const apiUrl = process.env.NODE_ENV === 'development' ?
-  'http://localhost:8000/gql/' : 'http://dotapra.cc/gql/';
-const client = new ApolloClient({ uri: apiUrl });
+const client = new ApolloClient(
+  { uri: `${window.location.href}gql/` }
+);
 
 class App extends React.Component {
   render() {
