@@ -12,13 +12,13 @@ jobs:
 
       - run:
           name: Build images
-          command: docker-compose -f docker-compose.yml build
+          command: docker-compose build
 
       - run:
           name: Push images
           command: |
             docker login rg.fr-par.scw.cloud/ipeterov -u nologin -p "$DOCKER_REGISTRY_TOKEN"
-            docker-compose -f docker-compose.yml push
+            docker-compose push
 
   deploy:
     docker:
@@ -27,10 +27,12 @@ jobs:
       - checkout
       - setup_remote_docker:
           version: 18.09.3
-      - add_ssh_keys
+      - add_ssh_keys  # For remote docker-compose up
+
       - run:
-          name: Keyscan (HACK)
+          name: Add dotapra.cc to known hosts
           command: ssh-keyscan -H dotapra.cc >> ~/.ssh/known_hosts
+
       - run:
           name: Deploy to Scaleway
           environment:
