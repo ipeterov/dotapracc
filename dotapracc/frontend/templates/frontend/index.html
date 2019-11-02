@@ -14,5 +14,9 @@
     {% else %}
         <script src="{% static "frontend/main-prod.js" %}"></script>
     {% endif %}
+    <script>
+        const LOGIN_URL = "{% url "social:begin" "steam" %}";
+        const LOGOUT_URL = "{% url "logout" %}";
+    </script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
 </html>

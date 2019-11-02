@@ -1,8 +1,7 @@
 import graphene
 from graphene_django.types import DjangoObjectType
 
-from django.contrib.auth.models import User
-
+from authentication.models import SteamUser
 from .models import SelectedHero, Hero
 
 
@@ -18,12 +17,13 @@ class SelectedHeroType(DjangoObjectType):
 
 class UserType(DjangoObjectType):
     class Meta:
-        model = User
+        model = SteamUser
 
     selected_heroes = graphene.List(SelectedHeroType)
 
-    def resolve_selected_heroes(self, info, **kwargs):
-        return self.selected_heroes.all()
+    @staticmethod
+    def resolve_selected_heroes(root, info, **kwargs):
+        return root.selected_heroes.all()
 
 
 class UpdateOrCreateSelectedHero(graphene.Mutation):
@@ -69,7 +69,10 @@ class Query(graphene.ObjectType):
     midlaners = graphene.List(HeroType)
 
     def resolve_viewer(self, info, **kwargs):
-        return info.context.user
+        user = info.context.user
+        if user.is_anonymous:
+            return None
+        return user
 
     def resolve_all_heroes(self, info, **kwargs):
         return Hero.objects.all()

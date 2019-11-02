@@ -1,7 +1,8 @@
-from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
 from django.conf import settings
 from django.db import models
+
+from authentication.models import SteamUser
 
 
 class HeroQuerySet(models.QuerySet):
@@ -93,7 +94,7 @@ class HeroMatchup(models.Model):
 
 class SelectedHero(models.Model):
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='selected_heroes',
+        SteamUser, on_delete=models.CASCADE, related_name='selected_heroes',
     )
     hero = models.ForeignKey(
         Hero, on_delete=models.CASCADE, related_name='+',

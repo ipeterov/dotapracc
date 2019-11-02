@@ -18,7 +18,7 @@ const QUERY = gql`
   query Base { 
     viewer {
       id
-      username
+      personaname
       selectedHeroes { ...selectedHero }
     } 
     allHeroes {
@@ -100,6 +100,12 @@ class SelectedHeroes extends React.Component {
       <Grid container justify="center">
         <CircularProgress />
       </Grid>
+    );
+
+    if (data.viewer == null) return (
+      <Typography>
+        Log in to be able to configure your profile
+      </Typography>
     );
 
     return (

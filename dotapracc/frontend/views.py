@@ -1,5 +1,6 @@
 from django.conf import settings
-from django.shortcuts import render
+from django.contrib.auth import logout
+from django.shortcuts import render, redirect
 
 
 def index(request):
@@ -8,3 +9,8 @@ def index(request):
         'frontend/index.html',
         context={'settings': settings},
     )
+
+
+def logout_view(request):
+    logout(request)
+    return redirect('index')
