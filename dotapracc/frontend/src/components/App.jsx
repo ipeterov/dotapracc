@@ -7,7 +7,7 @@ import Base from './Base.jsx'
 
 
 const client = new ApolloClient(
-  { uri: `${window.location.href}gql/` }
+  { uri: `${window.location.origin}/gql/` }
 );
 
 class App extends React.Component {

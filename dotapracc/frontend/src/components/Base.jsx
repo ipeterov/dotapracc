@@ -1,12 +1,19 @@
 import React from 'react';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link as RouterLink
+} from "react-router-dom";
 import gql from 'graphql-tag';
 import { useQuery } from "@apollo/react-hooks";
 
 import {
-  Container, AppBar, Toolbar, Typography, Grid, IconButton, Menu, MenuItem,
-  CircularProgress, Avatar, Button,
+  Container, AppBar, Toolbar, Grid, Link, Menu, MenuItem, CircularProgress,
+  Avatar, Button,
 } from '@material-ui/core';
 
+import About from './About.jsx';
 import SelectedHeroes from './SelectedHeroes.jsx';
 
 
@@ -42,7 +49,7 @@ export default function Base() {
   };
 
   return (
-    <>
+    <Router>
       <AppBar color="primary">
         <Toolbar>
           <Grid
@@ -51,9 +58,42 @@ export default function Base() {
             alignItems="center"
           >
             <Grid item>
-              <Typography variant="button">
-                dotapra.cc
-              </Typography>
+              <Grid
+                container
+                alignItems="center"
+                spacing={1}
+              >
+                <Grid item>
+                  <Link
+                    variant="button"
+                    color="inherit"
+                    component={RouterLink}
+                    to="/"
+                  >
+                    dotapra.cc
+                  </Link>
+                </Grid>
+                <Grid item>
+                  <Link
+                    variant="overline"
+                    color="inherit"
+                    component={RouterLink}
+                    to="/"
+                  >
+                    Profile
+                  </Link>
+                </Grid>
+                <Grid item>
+                  <Link
+                    variant="overline"
+                    color="inherit"
+                    component={RouterLink}
+                    to="/about/"
+                  >
+                    About
+                  </Link>
+                </Grid>
+              </Grid>
             </Grid>
 
             <Grid item>
@@ -113,8 +153,15 @@ export default function Base() {
         </Toolbar>
       </AppBar>
       <Container style={{ marginTop: 80 }} fixed={true} >
-        <SelectedHeroes />
+        <Switch>
+          <Route path="/about/">
+            <About />
+          </Route>
+          <Route path="/">
+            <SelectedHeroes />
+          </Route>
+        </Switch>
       </Container>
-    </>
+    </Router>
   );
 }
