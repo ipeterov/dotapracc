@@ -275,4 +275,6 @@ sftp-config.json
 .vscode/
 
 media/
-static/
+dotapracc/static/
+main.js
+main-prod.js

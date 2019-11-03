@@ -46,9 +46,9 @@ export default function Base() {
       <AppBar color="primary">
         <Toolbar>
           <Grid
+            container
             justify="space-between"
             alignItems="center"
-            container
           >
             <Grid item>
               <Typography variant="button">
@@ -58,49 +58,70 @@ export default function Base() {
 
             <Grid item>
               { data.viewer == null ? (
-                <Button color="inherit" href={LOGIN_URL}>Login</Button>
+                <img
+                  src="/static/frontend/steam.png"
+                  onClick={() => { window.location.href = LOGIN_URL; }}
+                  style={{ cursor: 'pointer' }}
+                />
               ) : (
-                <div>
-                  <IconButton
-                    aria-label="account of current user"
-                    aria-controls="menu-appbar"
-                    aria-haspopup="true"
-                    onClick={handleMenu}
-                    color="inherit"
-                  >
-                     <Avatar
-                       alt={data.viewer.personaname}
-                       src={data.viewer.avatarmedium}
-                     />
-                  </IconButton>
-                  <Menu
-                    id="menu-appbar"
-                    anchorEl={anchorEl}
-                    anchorOrigin={{
-                      vertical: 'top',
-                      horizontal: 'right',
-                    }}
-                    keepMounted
-                    transformOrigin={{
-                      vertical: 'top',
-                      horizontal: 'right',
-                    }}
-                    open={open}
-                    onClose={handleClose}
-                  >
-                    <MenuItem
-                      onClick={() => { window.location.href = LOGOUT_URL; }}
+                <Grid
+                  container
+                  direction="row"
+                  alignItems="center"
+                >
+                  <Grid item>
+                    <Typography
+                      onClick={handleMenu}
+                      style={{ cursor: 'pointer' }}
                     >
-                      Log out
-                    </MenuItem>
-                  </Menu>
-                </div>
+                      {data.viewer.personaname}
+                    </Typography>
+                  </Grid>
+                  <Grid item>
+                    <IconButton
+                      aria-label="account of current user"
+                      aria-controls="menu-appbar"
+                      aria-haspopup="true"
+                      onClick={handleMenu}
+                      color="inherit"
+                    >
+                       <Avatar
+                         alt={data.viewer.personaname}
+                         src={data.viewer.avatarmedium}
+                       />
+                    </IconButton>
+                    <Menu
+                      id="menu-appbar"
+                      anchorEl={anchorEl}
+                      anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                      }}
+                      keepMounted
+                      transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                      }}
+                      open={open}
+                      onClose={handleClose}
+                    >
+                      <MenuItem
+                        onClick={() => { window.location.href = LOGOUT_URL; }}
+                      >
+                        Log out
+                      </MenuItem>
+                    </Menu>
+                  </Grid>
+                </Grid>
               )}
             </Grid>
           </Grid>
         </Toolbar>
       </AppBar>
       <Container style={{ marginTop: 80 }} fixed={true} >
+                            <Button color="inherit">
+                      Find Match
+                    </Button>
         <SelectedHeroes />
       </Container>
     </>

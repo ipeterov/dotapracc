@@ -34,6 +34,7 @@ export default function AddHeroDialog({ allHeroes, handleAdd }) {
           <FormControl>
             <InputLabel>Hero</InputLabel>
             <Select
+              autoFocus
               style={{ width: '200px' }}
               value={heroId}
               onChange={({target}) => {setHeroId(target.value)}}
