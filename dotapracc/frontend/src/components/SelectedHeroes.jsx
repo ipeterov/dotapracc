@@ -104,7 +104,7 @@ class SelectedHeroes extends React.Component {
 
     if (data.viewer == null) return (
       <Typography>
-        Log in to be able to configure your profile
+        Log in to be able to configure your profile.
       </Typography>
     );
 

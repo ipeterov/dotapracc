@@ -4,7 +4,7 @@ import { useQuery } from "@apollo/react-hooks";
 
 import {
   Container, AppBar, Toolbar, Typography, Grid, IconButton, Menu, MenuItem,
-  CircularProgress, Button, Avatar,
+  CircularProgress, Avatar, Button,
 } from '@material-ui/core';
 
 import SelectedHeroes from './SelectedHeroes.jsx';
@@ -70,26 +70,20 @@ export default function Base() {
                   alignItems="center"
                 >
                   <Grid item>
-                    <Typography
+                    <Button
+                      variant="text"
+                      color="inherit"
                       onClick={handleMenu}
-                      style={{ cursor: 'pointer' }}
+                      endIcon={
+                        <Avatar
+                          alt={data.viewer.personaname}
+                          src={data.viewer.avatarmedium}
+                         />
+                      }
                     >
                       {data.viewer.personaname}
-                    </Typography>
-                  </Grid>
-                  <Grid item>
-                    <IconButton
-                      aria-label="account of current user"
-                      aria-controls="menu-appbar"
-                      aria-haspopup="true"
-                      onClick={handleMenu}
-                      color="inherit"
-                    >
-                       <Avatar
-                         alt={data.viewer.personaname}
-                         src={data.viewer.avatarmedium}
-                       />
-                    </IconButton>
+                    </Button>
+
                     <Menu
                       id="menu-appbar"
                       anchorEl={anchorEl}
@@ -119,9 +113,6 @@ export default function Base() {
         </Toolbar>
       </AppBar>
       <Container style={{ marginTop: 80 }} fixed={true} >
-                            <Button color="inherit">
-                      Find Match
-                    </Button>
         <SelectedHeroes />
       </Container>
     </>

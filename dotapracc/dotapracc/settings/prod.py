@@ -2,7 +2,7 @@ from .base import *
 
 
 DEBUG = False
-ALLOWED_HOSTS = ['web']  # Адрес контейнера - его имя
+ALLOWED_HOSTS = ['web', 'dotapra.cc']  # Адрес контейнера - его имя
 STATIC_ROOT = os.path.join(BASE_DIR, '../static')
 
 DATABASES = {
