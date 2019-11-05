@@ -25,7 +25,7 @@ export default class MatchFinder extends React.Component {
       heroPairs: {},
     };
 
-    this.sock = new W3CWebSocket(`ws://${window.location.host}/ws/find_match`);
+    this.sock = new W3CWebSocket(`wss://${window.location.host}/ws/find_match`);
   }
 
   componentDidMount() {
