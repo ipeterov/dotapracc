@@ -1,1 +1,1 @@
- web: gunicorn dotapracc.wsgi
+ web: gunicorn dotapracc.dotapracc.wsgi
