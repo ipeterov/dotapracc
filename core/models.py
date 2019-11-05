@@ -212,7 +212,7 @@ class PlayerSearch(models.Model):
     def suggest_match(self, other_search):
         self.match = other_search
         channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.send)(self.dumps())
+        async_to_sync(channel_layer.send)(self.channel_name, self.dumps())
 
     @transition(field=state, source='found_match', target='accepted_match')
     def accept_match(self):
