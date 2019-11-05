@@ -138,7 +138,7 @@ class SelectedHero extends React.Component {
           <CardHeader
             avatar={
               <Avatar
-                src={'media/' + selectedHero.hero.picture}
+                src={selectedHero.hero.picture}
                 style={{ width: '80px', height: '80px' }}
               />
             }
@@ -178,7 +178,7 @@ class SelectedHero extends React.Component {
                     onMouseLeave={() => this.setState({ highlightedHeroId: null })}
                   >
                     <img
-                      src={'media/' + hero.picture}
+                      src={hero.picture}
                       alt={hero.name}
                       style={this.getGreyscaleStyle(hero.id, matchups)}
                     />
