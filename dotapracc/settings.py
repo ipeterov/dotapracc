@@ -60,8 +60,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'dotapracc.urls'
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = 'https://dotapracc.s3.amazonaws.com/'
 
 TEMPLATES = [
     {
