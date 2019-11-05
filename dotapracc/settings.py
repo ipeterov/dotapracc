@@ -233,5 +233,6 @@ DOTABUFF_SCRAPE_USER_AGENT = (
 
 TOP_N_MATCHUPS = 5
 
+DEBUG = True
 
 django_heroku.settings(locals())
