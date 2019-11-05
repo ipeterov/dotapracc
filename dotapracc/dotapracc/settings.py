@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import os
 
+import django_heroku
+
 from social_core.pipeline.social_auth import social_user
 from social_core.pipeline.user import get_username
 
@@ -224,3 +226,6 @@ DOTABUFF_SCRAPE_USER_AGENT = (
 )
 
 TOP_N_MATCHUPS = 5
+
+
+django_heroku.settings(locals())
