@@ -4,8 +4,8 @@
   "description": "database - https://api.elephantsql.com/console/1e9ee8e6-e3b3-407c-9c13-89cd4efce7d9/details?",
   "main": "index.js",
   "scripts": {
-    "start": "webpack --mode development --watch ./dotapracc/frontend/src/index.js --output ./dotapracc/frontend/static/frontend/main.js",
-    "build": "webpack --mode production ./dotapracc/frontend/src/index.js --output ./dotapracc/frontend/static/frontend/main-prod.js"
+    "start": "webpack --mode development --watch ./frontend/src/index.js --output ./frontend/static/frontend/main.js",
+    "build": "webpack --mode production ./frontend/src/index.js --output ./frontend/static/frontend/main-prod.js"
   },
   "repository": {
     "type": "git",
