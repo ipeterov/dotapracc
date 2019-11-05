@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Hero, HeroMatchup, SelectedHero
+from .models import Hero, HeroMatchup, PlayerSearch, SelectedHero
 
 
 class HeroMatchupAdmin(admin.ModelAdmin):
@@ -16,4 +16,5 @@ class HeroAdmin(admin.ModelAdmin):
 
 admin.site.register(Hero, HeroAdmin)
 admin.site.register(HeroMatchup, HeroMatchupAdmin)
+admin.site.register(PlayerSearch)
 admin.site.register(SelectedHero)
