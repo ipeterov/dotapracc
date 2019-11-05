@@ -17,7 +17,6 @@ class MatchFinderConsumer(WebsocketConsumer):
         if current_search and current_search.state != 'not_searching':
             current_search.channel_name = self.channel_name
             current_search.save()
-        print('connected', current_search)
         self.send(current_search.dumps())
 
     def disconnect(self, close_code):
