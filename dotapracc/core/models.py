@@ -1,6 +1,14 @@
+import json
+from collections import defaultdict
+
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+from django_fsm import FSMField, transition
+
 from django.contrib.postgres.fields import ArrayField
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
+from django.utils.timezone import now
 
 from authentication.models import SteamUser
 
@@ -92,6 +100,21 @@ class HeroMatchup(models.Model):
         return f'{hero} has {advantage} advantage over {other_hero}'
 
 
+class SelectedHeroQuerySet(models.QuerySet):
+    def as_dict(self):
+        return {
+            sh.hero.name: sh.matchups.values_list('name', flat=True)
+            for sh in self.all()
+        }
+
+    def as_reverse_dict(self):
+        reverse = defaultdict(list)
+        for hero, matchups in self.as_dict().items():
+            for matchup in matchups:
+                reverse[matchup].append(hero)
+        return reverse
+
+
 class SelectedHero(models.Model):
     user = models.ForeignKey(
         SteamUser, on_delete=models.CASCADE, related_name='selected_heroes',
@@ -99,10 +122,128 @@ class SelectedHero(models.Model):
     hero = models.ForeignKey(
         Hero, on_delete=models.CASCADE, related_name='+',
     )
-
     matchups = models.ManyToManyField(
         Hero, blank=True, related_name='+',
     )
 
+    objects = SelectedHeroQuerySet.as_manager()
+
     def __str__(self):
-        return f'{self.user.username} is training {self.hero}'
+        return f'{self.user} is training {self.hero}'
+
+
+class PlayerSearchManager(models.Manager):
+    @transaction.atomic
+    def find_matches(self):
+        searching = self.filter(state='started_search')
+
+        for search in searching:
+            for other in searching:
+                if search == other:
+                    continue
+
+                if search.state != 'started_search' or other.state != 'started_search':
+                    continue
+
+                if search.can_match_with(other):
+                    search.suggest_match(other)
+                    search.save()
+
+                    other.suggest_match(search)
+                    other.save()
+
+    def active(self):
+        return self.filter(state__in={
+            'started_search',
+            'found_match',
+            'accepted_match',
+        })
+
+
+class PlayerSearch(models.Model):
+    user = models.ForeignKey(
+        SteamUser, on_delete=models.CASCADE, related_name='searches',
+    )
+    match = models.ForeignKey(
+        'self', on_delete=models.SET_NULL, blank=True, null=True,
+        related_name='+',
+    )
+
+    started_at = models.DateTimeField(auto_now_add=True)
+    ended_at = models.DateTimeField(null=True, blank=True)
+    state = FSMField(default='started_search')
+
+    channel_name = models.CharField(max_length=64, blank=True, null=True)
+
+    objects = PlayerSearchManager()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user'],
+                condition=models.Q(state__in={
+                    'started_search',
+                    'found_match',
+                    'accepted_match',
+                }),
+                name='unique_active_search',
+            ),
+        ]
+
+    def __str__(self):
+        return f'{self.user} started at {self.started_at}'
+
+    def as_dict(self):
+        return {
+            'state': self.state,
+            'startedAt': self.started_at and self.started_at.isoformat(),
+            'opponent': self.match and self.match.user.personaname,
+            'heroPairs': self.match and self.hero_pairs(self.match),
+        }
+
+    def dumps(self):
+        return json.dumps(self.as_dict())
+
+    @transition(field=state, source='started_search', target='cancelled')
+    def cancel_search(self):
+        self.ended_at = now()
+
+    @transition(field=state, source='started_search', target='found_match')
+    def suggest_match(self, other_search):
+        self.match = other_search
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.send)(self.dumps())
+
+    @transition(field=state, source='found_match', target='accepted_match')
+    def accept_match(self):
+        self.ended_at = now()
+
+    @transition(
+        field=state,
+        source=['found_match', 'accepted_match'],
+        target='started_search',
+    )
+    def decline_match(self):
+        pass
+
+    @transition(field=state, source='accepted_match', target='finished')
+    def set_finished(self):
+        pass
+
+    def hero_pairs(self, other):
+        self_heroes = self.user.selected_heroes.as_dict()
+        other_reverse = other.user.selected_heroes.as_reverse_dict()
+
+        pairs = []
+        for hero, matchups in self_heroes.items():
+            for matchup in matchups:
+                if matchup in other_reverse[hero]:
+                    pairs.append((hero, matchup))
+
+        return pairs
+
+    def can_match_with(self, other):
+        if not self.hero_pairs(other):
+            return False
+
+        return True

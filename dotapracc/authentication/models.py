@@ -54,6 +54,9 @@ class SteamUser(AbstractBaseUser, PermissionsMixin):
 
     objects = SteamUserManager()
 
+    def __str__(self):
+        return f'{self.personaname} ({self.steamid})'
+
     def get_short_name(self):
         return self.personaname
 

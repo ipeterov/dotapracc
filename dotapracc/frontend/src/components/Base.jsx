@@ -15,6 +15,7 @@ import {
 
 import About from './About.jsx';
 import SelectedHeroes from './SelectedHeroes.jsx';
+import MatchFinder from './MatchFinder.jsx';
 
 
 const QUERY = gql`
@@ -108,7 +109,12 @@ export default function Base() {
                   container
                   direction="row"
                   alignItems="center"
+                  spacing={2}
                 >
+                  <Grid item>
+                    <MatchFinder />
+                  </Grid>
+
                   <Grid item>
                     <Button
                       variant="text"
