@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'django_celery_beat',
     'channels',
     'graphene_django',
     'social_django',
@@ -117,7 +118,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [os.environ.get('REDIS_URL')],
+            "hosts": [os.environ.get('REDISTOGO_URL')],
         },
     },
 }
@@ -204,6 +205,8 @@ GRAPHENE = {
     'SCHEMA': 'dotapracc.schema.schema',
 }
 
+CELERY_BROKER_URL = os.environ['REDISTOGO_URL']
+CELERY_RESULT_BACKEND = os.environ['REDISTOGO_URL']
 
 OPENDOTA_API_URL = 'https://api.opendota.com/'
 OPENDOTA_PUBLIC_API_URL = f'{OPENDOTA_API_URL}api/'
