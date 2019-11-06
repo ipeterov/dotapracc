@@ -5,9 +5,10 @@ import autoBind from 'react-autobind';
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
 
 import {
-  Button, Typography, Dialog, DialogActions, DialogContent, CircularProgress,
-  Grid, DialogTitle,
+  Typography, Dialog, DialogActions, DialogContent, CircularProgress, Grid,
+  DialogTitle, Table, TableBody, TableRow, TableCell, TextField, Tooltip,
 } from '@material-ui/core';
+import {CopyToClipboard} from 'react-copy-to-clipboard';
 
 import MyButton from './MyButton.jsx';
 
@@ -24,6 +25,7 @@ export default class MatchFinder extends React.Component {
       startedAt: null,
       opponent: {},
       heroPairs: [],
+      copied: false,
     };
 
     this.sock = new W3CWebSocket(`ws://${window.location.host}/ws/find_match`);
@@ -39,6 +41,7 @@ export default class MatchFinder extends React.Component {
       } = JSON.parse(message.data);
       const loading = false;
       const postMatchOpen = state === 'finished';
+      const copied = false;
       this.setState({
         state,
         startedAt,
@@ -46,6 +49,7 @@ export default class MatchFinder extends React.Component {
         heroPairs,
         loading,
         postMatchOpen,
+        copied,
       });
     };
   }
@@ -72,6 +76,39 @@ export default class MatchFinder extends React.Component {
     this.setState({ loading: true }, () => {
       this.sock.send('decline_match');
     });
+  }
+
+  renderOpponentDetails() {
+    return (
+      <Table>
+        <TableBody>
+          <TableRow>
+            <TableCell align="left">Opponent</TableCell>
+            <TableCell />
+            <TableCell align="right">
+              {this.state.opponent.personaName}
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell align="left">MMR estimate (from OpenDota)</TableCell>
+            <TableCell />
+            <TableCell align="right">
+              {this.state.opponent.mmrEstimate}
+            </TableCell>
+          </TableRow>
+          {_.map(this.state.heroPairs, (heroPair) => {
+              const [hero, matchup] = heroPair;
+              return (
+                <TableRow key={hero + matchup}>
+                  <TableCell align="left">{hero}</TableCell>
+                  <TableCell align="center">vs</TableCell>
+                  <TableCell align="right">{matchup}</TableCell>
+                </TableRow>
+              );
+          })}
+        </TableBody>
+      </Table>
+    );
   }
 
   render() {
@@ -127,18 +164,7 @@ export default class MatchFinder extends React.Component {
           <Dialog open={true}>
             <DialogTitle>Found match</DialogTitle>
             <DialogContent>
-              <Typography>
-                Opponent: {this.state.opponent.personaName}.
-              </Typography>
-              <Typography>Matchups:</Typography>
-              {_.map(this.state.heroPairs, (heroPair) => {
-                  const [hero, matchup] = heroPair;
-                  return (
-                    <Typography key={hero} variant="body2">
-                      {hero} vs {matchup}
-                    </Typography>
-                  );
-              })}
+              {this.renderOpponentDetails()}
             </DialogContent>
             <DialogActions>
               <MyButton
@@ -181,22 +207,27 @@ export default class MatchFinder extends React.Component {
         >
           <DialogTitle>Your match details</DialogTitle>
           <DialogContent>
-            <Typography>
-              Opponent: {this.state.opponent.personaName}.
-            </Typography>
-            <Typography>Steam ID: {this.state.opponent.id}.</Typography>
-            <Typography>
-              MMR estimate (from OpenDota): {this.state.opponent.mmrEstimate}.
-            </Typography>
-            <Typography>Matchups:</Typography>
-            {_.map(this.state.heroPairs, (heroPair) => {
-                const [hero, matchup] = heroPair;
-                return (
-                  <Typography key={hero} variant="body2">
-                    {hero} vs {matchup}
-                  </Typography>
-                );
-            })}
+            {this.renderOpponentDetails()}
+            <Tooltip
+              open={this.state.copied}
+              disableFocusListener
+              disableHoverListener
+              disableTouchListener
+              placement="top"
+              title="Copied"
+            >
+              <CopyToClipboard
+                text={this.state.opponent.id}
+                onCopy={() => this.setState({copied: true})}
+              >
+                <TextField
+                  label="Copy Steam ID to clipboard"
+                  margin="normal"
+                  variant="outlined"
+                  value={this.state.opponent.id}
+                />
+              </CopyToClipboard>
+            </Tooltip>
           </DialogContent>
         </Dialog>
       </>
