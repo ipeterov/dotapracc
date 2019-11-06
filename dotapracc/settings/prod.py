@@ -6,7 +6,7 @@ from .base import *
 DEBUG = False
 
 SECURE_SSL_REDIRECT = True
-SECURE_PROXY_SSL_HEADER = ('X-Forwarded-Proto', 'https')
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
