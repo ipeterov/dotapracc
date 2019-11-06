@@ -196,6 +196,7 @@ class PlayerSearch(models.Model):
             'state': self.state,
             'startedAt': self.started_at and self.started_at.isoformat(),
             'opponent': self.match and self.match.user.personaname,
+            'opponentId': self.match and self.match.user.steamid,
             'heroPairs': self.match and self.hero_pairs(self.match),
         }
 

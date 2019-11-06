@@ -19,9 +19,11 @@ export default class MatchFinder extends React.Component {
 
     this.state = {
       loading: null,
+      postMatchOpen: false,
       state: null,
       startedAt: null,
       opponent: null,
+      opponentId: null,
       heroPairs: {},
     };
 
@@ -30,10 +32,26 @@ export default class MatchFinder extends React.Component {
 
   componentDidMount() {
     this.sock.onmessage = (message) => {
-      const { state, startedAt, opponent, heroPairs } = JSON.parse(message.data);
+      const {
+        state,
+        startedAt,
+        opponent,
+        opponentId,
+        heroPairs,
+      } = JSON.parse(message.data);
       const loading = false;
+      const postMatchOpen = state === 'finished';
+
       console.log(message);
-      this.setState({ state, startedAt, opponent, heroPairs, loading });
+      this.setState({
+        state,
+        startedAt,
+        opponent,
+        opponentId,
+        heroPairs,
+        loading,
+        postMatchOpen,
+      });
     };
   }
 
@@ -148,15 +166,37 @@ export default class MatchFinder extends React.Component {
     } else if (this.state.state === 'accepted_match') {
       return <Typography>Waiting for other player to accept</Typography>;
     }
+
     return (
-      <MyButton
-        onClick={this.startSearch}
-        variant="contained"
-        color="secondary"
-        loading={this.state.loading}
-      >
-        Find match
-      </MyButton>
+      <>
+        <MyButton
+          onClick={this.startSearch}
+          variant="contained"
+          color="secondary"
+          loading={this.state.loading}
+        >
+          Find match
+        </MyButton>
+        <Dialog
+          open={this.state.postMatchOpen}
+          onClose={() => this.setState({ postMatchOpen: false })}
+        >
+          <DialogTitle>Your match details</DialogTitle>
+          <DialogContent>
+            <Typography>Opponent: {this.state.opponent}.</Typography>
+            <Typography>Steam ID: {this.state.opponentId}.</Typography>
+            <Typography>Matchups:</Typography>
+            {_.map(this.state.heroPairs, (heroPair) => {
+                const [hero, matchup] = heroPair;
+                return (
+                  <Typography key={hero} variant="body2">
+                    {hero} vs {matchup}
+                  </Typography>
+                );
+            })}
+          </DialogContent>
+        </Dialog>
+      </>
     );
   }
 }
