@@ -28,6 +28,7 @@ export default class MatchFinder extends React.Component {
       copied: false,
     };
 
+    this.steamIdInput = React.createRef();
     this.sock = new W3CWebSocket(`ws://${window.location.host}/ws/find_match`);
   }
 
@@ -99,7 +100,7 @@ export default class MatchFinder extends React.Component {
           {_.map(this.state.heroPairs, (heroPair) => {
               const [hero, matchup] = heroPair;
               return (
-                <TableRow key={hero + matchup}>
+                <TableRow key={hero + matchup} >
                   <TableCell align="left">{hero}</TableCell>
                   <TableCell align="center">vs</TableCell>
                   <TableCell align="right">{matchup}</TableCell>
@@ -218,13 +219,17 @@ export default class MatchFinder extends React.Component {
             >
               <CopyToClipboard
                 text={this.state.opponent.id}
-                onCopy={() => this.setState({copied: true})}
+                onCopy={() => {
+                  this.setState({ copied: true });
+                  this.steamIdInput.select();
+                }}
               >
                 <TextField
                   label="Copy Steam ID to clipboard"
                   margin="normal"
                   variant="outlined"
                   value={this.state.opponent.id}
+                  inputRef={input => { this.steamIdInput = input}}
                 />
               </CopyToClipboard>
             </Tooltip>
