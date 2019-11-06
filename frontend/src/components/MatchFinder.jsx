@@ -22,9 +22,8 @@ export default class MatchFinder extends React.Component {
       postMatchOpen: false,
       state: null,
       startedAt: null,
-      opponent: null,
-      opponentId: null,
-      heroPairs: {},
+      opponent: {},
+      heroPairs: [],
     };
 
     this.sock = new W3CWebSocket(`ws://${window.location.host}/ws/find_match`);
@@ -36,18 +35,14 @@ export default class MatchFinder extends React.Component {
         state,
         startedAt,
         opponent,
-        opponentId,
         heroPairs,
       } = JSON.parse(message.data);
       const loading = false;
       const postMatchOpen = state === 'finished';
-
-      console.log(message);
       this.setState({
         state,
         startedAt,
         opponent,
-        opponentId,
         heroPairs,
         loading,
         postMatchOpen,
@@ -132,7 +127,10 @@ export default class MatchFinder extends React.Component {
           <Dialog open={true}>
             <DialogTitle>Found match</DialogTitle>
             <DialogContent>
-              <Typography>Opponent: {this.state.opponent}. Matchups:</Typography>
+              <Typography>
+                Opponent: {this.state.opponent.personaName}.
+              </Typography>
+              <Typography>Matchups:</Typography>
               {_.map(this.state.heroPairs, (heroPair) => {
                   const [hero, matchup] = heroPair;
                   return (
@@ -183,8 +181,13 @@ export default class MatchFinder extends React.Component {
         >
           <DialogTitle>Your match details</DialogTitle>
           <DialogContent>
-            <Typography>Opponent: {this.state.opponent}.</Typography>
-            <Typography>Steam ID: {this.state.opponentId}.</Typography>
+            <Typography>
+              Opponent: {this.state.opponent.personaName}.
+            </Typography>
+            <Typography>Steam ID: {this.state.opponent.id}.</Typography>
+            <Typography>
+              MMR estimate (from OpenDota): {this.state.opponent.mmrEstimate}.
+            </Typography>
             <Typography>Matchups:</Typography>
             {_.map(this.state.heroPairs, (heroPair) => {
                 const [hero, matchup] = heroPair;

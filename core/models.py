@@ -195,9 +195,12 @@ class PlayerSearch(models.Model):
         return {
             'state': self.state,
             'startedAt': self.started_at and self.started_at.isoformat(),
-            'opponent': self.match and self.match.user.personaname,
-            'opponentId': self.match and self.match.user.steamid,
             'heroPairs': self.match and self.hero_pairs(self.match),
+            'opponent': {
+                'id': self.match.user.steam32id,
+                'personaName': self.match.user.personaname,
+                'mmrEstimate': self.match.user.mmr_estimate,
+            } if self.match else {},
         }
 
     def dumps(self):

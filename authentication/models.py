@@ -75,4 +75,4 @@ class SteamUser(AbstractBaseUser, PermissionsMixin):
     def sync_with_opendota(self):
         api = OpenDotaAPI()
         info = api.get_profile_info(self.steam32id)
-        self.mmr_estimate = info['mmr_estimate']['estimate']
+        self.mmr_estimate = info.get('mmr_estimate', {}).get('estimate')
