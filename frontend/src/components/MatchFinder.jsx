@@ -28,8 +28,10 @@ export default class MatchFinder extends React.Component {
       copied: false,
     };
 
+    const prefix = process.env.NODE_ENV === 'development' ? 'ws' : 'wss';
+    this.sock = new W3CWebSocket(`${prefix}://${window.location.host}/ws/find_match`);
+
     this.steamIdInput = React.createRef();
-    this.sock = new W3CWebSocket(`ws://${window.location.host}/ws/find_match`);
   }
 
   componentDidMount() {
