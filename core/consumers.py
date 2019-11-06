@@ -4,6 +4,10 @@ from .models import PlayerSearch
 
 
 class MatchFinderConsumer(WebsocketConsumer):
+    def websocket_send(self, event):
+        print('sending from worker: ', event['message'])
+        self.send(event['message'])
+
     def current_search(self):
         user = self.scope['user']
         search = user.searches.active().first()
@@ -39,8 +43,10 @@ class MatchFinderConsumer(WebsocketConsumer):
             current_search.decline_match()
             current_search.match.decline_match()
 
+        current_search.channel_name = self.channel_name
         current_search.save()
         if current_search.match:
             current_search.match.save()
+            current_search.match.push_to_websocket()
 
         self.send(current_search.dumps())
