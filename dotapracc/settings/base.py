@@ -199,6 +199,9 @@ SOCIAL_AUTH_PIPELINE = (
     # 'social_core.pipeline.user.user_details',
     # Use a custom function for this, since the details are provided separately
     'authentication.pipeline.user_details',
+
+    # Sync with OpenDota
+    'authentication.pipeline.sync_with_opendota',
 )
 
 GRAPHENE = {

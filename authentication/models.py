@@ -3,6 +3,8 @@ from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 from django.utils import timezone
 
+from core.opendota import OpenDotaAPI
+
 
 class SteamUserManager(BaseUserManager):
     def _create_user(self, steamid, password, **extra_fields):
@@ -48,6 +50,8 @@ class SteamUser(AbstractBaseUser, PermissionsMixin):
     avatarmedium = models.CharField(max_length=255)
     avatarfull = models.CharField(max_length=255)
 
+    mmr_estimate = models.IntegerField(null=True, blank=True)
+
     date_joined = models.DateTimeField('date joined', default=timezone.now)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -57,8 +61,18 @@ class SteamUser(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return f'{self.personaname} ({self.steamid})'
 
+    @property
+    def steam32id(self):
+        as_str = str(self.steamid)
+        return int(as_str[3:]) - 61197960265728
+
     def get_short_name(self):
         return self.personaname
 
     def get_full_name(self):
         return self.personaname
+
+    def sync_with_opendota(self):
+        api = OpenDotaAPI()
+        info = api.get_profile_info(self.steam32id)
+        self.mmr_estimate = info['mmr_estimate']['estimate']

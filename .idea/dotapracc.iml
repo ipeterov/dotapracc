@@ -6,7 +6,7 @@
         <option name="rootFolder" value="$MODULE_DIR$" />
         <option name="settingsModule" value="dotapracc/settings/dev.py" />
         <option name="manageScript" value="manage.py" />
-        <option name="environment" value="&lt;map&gt;&#10;  &lt;entry&gt;&#10;    &lt;string&gt;REDIS_URL&lt;/string&gt;&#10;    &lt;string&gt;redis://h:p8be09c994abbab3a85706e99e173f023a263883046f907dfb838baed9635fa3b@ec2-3-213-149-16.compute-1.amazonaws.com:29299 &lt;/string&gt;&#10;  &lt;/entry&gt;&#10;&lt;/map&gt;" />
+        <option name="environment" value="&lt;map&gt;&#10;  &lt;entry&gt;&#10;    &lt;string&gt;REDISTOGO_URL&lt;/string&gt;&#10;    &lt;string&gt;redis://h:redis://redistogo:f94a37a46187c19144ce7e22dbe86c1a@hammerjaw.redistogo.com:11653/@ec2-3-213-149-16.compute-1.amazonaws.com:29299&lt;/string&gt;&#10;  &lt;/entry&gt;&#10;&lt;/map&gt;" />
         <option name="doNotUseTestRunner" value="false" />
         <option name="trackFilePattern" value="" />
       </configuration>

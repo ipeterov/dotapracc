@@ -60,3 +60,6 @@ class OpenDotaAPI:
         url = urljoin(api, f'apps/dota2/images/heroes/{name}_full.png')
         raw_data = requests.get(url).content
         return ContentFile(raw_data, name=f'{name}.png')
+
+    def get_profile_info(self, steam32id):
+        return self.get(f'players/{steam32id}')
