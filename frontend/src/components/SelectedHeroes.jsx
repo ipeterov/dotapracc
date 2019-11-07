@@ -45,6 +45,7 @@ class SelectedHeroes extends React.Component {
     autoBind(this);
 
     this.state = {
+      added: [],
       adding: false,
       deleting: [],
     };
@@ -63,7 +64,8 @@ class SelectedHeroes extends React.Component {
           ],
           awaitRefetchQueries: true,
         }).then(() => {
-          this.setState({ adding: false });
+          const added = [heroId].concat(this.state.added);
+          this.setState({ adding: false, added });
         });
       }
     );
@@ -127,18 +129,6 @@ class SelectedHeroes extends React.Component {
           )
         }
         {
-          data.viewer.selectedHeroes.map((selectedHero) => (
-            <SelectedHero
-              selectedHero={selectedHero}
-              allHeroes={data.allHeroes}
-              midlaners={data.midlaners}
-              handleDelete={this.handleDelete}
-              deleting={this.state.deleting.includes(selectedHero.id)}
-              key={selectedHero.id}
-            />
-          ))
-        }
-        {
           this.state.adding && (
             <Grid item xs={12}>
               <Grid container justify="center">
@@ -146,6 +136,19 @@ class SelectedHeroes extends React.Component {
               </Grid>
             </Grid>
           )
+        }
+        {
+          data.viewer.selectedHeroes.map((selectedHero) => (
+            <SelectedHero
+              selectedHero={selectedHero}
+              allHeroes={data.allHeroes}
+              midlaners={data.midlaners}
+              handleDelete={this.handleDelete}
+              deleting={this.state.deleting.includes(selectedHero.id)}
+              justAdded={this.state.added.includes(selectedHero.hero.id)}
+              key={selectedHero.id + this.state.added.includes(selectedHero.hero.id)}
+            />
+          ))
         }
       </Grid>
     );

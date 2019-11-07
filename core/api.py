@@ -23,7 +23,7 @@ class UserType(DjangoObjectType):
 
     @staticmethod
     def resolve_selected_heroes(root, info, **kwargs):
-        return root.selected_heroes.all()
+        return root.selected_heroes.order_by('-id')
 
 
 class UpdateOrCreateSelectedHero(graphene.Mutation):

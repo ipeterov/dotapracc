@@ -50,7 +50,8 @@ class SelectedHero extends React.Component {
     super(props);
 
     this.state = {
-      highlightedHeroId: null
+      highlightedHeroId: null,
+      matchupsExpanded: props.justAdded,
     };
   }
 
@@ -159,10 +160,31 @@ class SelectedHero extends React.Component {
           />
 
           <CardContent>
-            <Typography variant={'overline'}>
-              Will match with:
-            </Typography>
-            {['STRENGTH', 'AGILITY', 'INTELLECT'].map(attribute => (
+            <Grid container justify="space-between">
+              { this.state.matchupsExpanded &&
+                <Grid item>
+                  <Typography variant={'overline'}>
+                    Will match with:
+                  </Typography>
+                </Grid>
+              }
+              <Grid item>
+                <Button
+                  onClick={() => {
+                    this.setState({matchupsExpanded: !this.state.matchupsExpanded});
+                    console.log(this.state);
+                  }}
+                >
+                  {
+                    this.state.matchupsExpanded ?
+                      'Hide matchups' :
+                      `Configure matchups for ${name}`
+                  }
+                </Button>
+              </Grid>
+            </Grid>
+            { this.state.matchupsExpanded &&
+              ['STRENGTH', 'AGILITY', 'INTELLECT'].map(attribute => (
               <GridList
                 key={attribute}
                 spacing={1}
@@ -186,30 +208,35 @@ class SelectedHero extends React.Component {
                 ))}
               </GridList>
             ))}
-            <Grid container justify="center">
-              <ButtonGroup variant="text" size="medium">
-                <Button onClick={this.toggleHeroes(midlaners)}>
-                  Toggle all mids
-                </Button>
-                <Button onClick={this.toggleHeroes(counters)}>
-                  Toggle counters
-                </Button>
-                <Button onClick={this.toggleHeroes(easyLanes)}>
-                  Toggle easy lanes
-                </Button>
-              </ButtonGroup>
-              <ButtonGroup variant="text" size="medium">
-                <Button onClick={() => {
-                  const ids = this.getIdArray(allHeroes);
-                  this.setHeroes(selectedHero,ids)}
-                }>
-                  Add all
-                </Button>
-                <Button onClick={() => {this.setHeroes(selectedHero,[])}}>
-                  Clear
-                </Button>
-              </ButtonGroup>
-            </Grid>
+            {this.state.matchupsExpanded &&
+              <Grid container justify="center">
+                <ButtonGroup variant="text" size="medium">
+                  <Button onClick={this.toggleHeroes(midlaners)}>
+                    Toggle all mids
+                  </Button>
+                  <Button onClick={this.toggleHeroes(counters)}>
+                    Toggle counters
+                  </Button>
+                  <Button onClick={this.toggleHeroes(easyLanes)}>
+                    Toggle easy lanes
+                  </Button>
+                </ButtonGroup>
+                <ButtonGroup variant="text" size="medium">
+                  <Button onClick={() => {
+                    const ids = this.getIdArray(allHeroes);
+                    this.setHeroes(selectedHero, ids)
+                  }
+                  }>
+                    Add all
+                  </Button>
+                  <Button onClick={() => {
+                    this.setHeroes(selectedHero, [])
+                  }}>
+                    Clear
+                  </Button>
+                </ButtonGroup>
+              </Grid>
+            }
           </CardContent>
         </Card>
       </Grid>
@@ -224,6 +251,7 @@ SelectedHero.propTypes = {
   mutate: PropTypes.func.isRequired,
   handleDelete: PropTypes.func.isRequired,
   deleting: PropTypes.bool.isRequired,
+  justAdded: PropTypes.bool.isRequired,
 };
 
 export default graphql(UPDATE_OR_CREATE_SELECTED_HERO)(SelectedHero)
