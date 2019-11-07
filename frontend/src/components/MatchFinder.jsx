@@ -1,8 +1,10 @@
 import _ from 'lodash';
 import React from 'react';
+import PropTypes from 'prop-types';
 import ReactTimeAgo from 'react-time-ago';
 import autoBind from 'react-autobind';
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
+import { withSnackbar } from 'notistack';
 
 import {
   Typography, Dialog, DialogActions, DialogContent, CircularProgress, Grid,
@@ -13,7 +15,7 @@ import {CopyToClipboard} from 'react-copy-to-clipboard';
 import MyButton from './MyButton.jsx';
 
 
-export default class MatchFinder extends React.Component {
+class MatchFinder extends React.Component {
   constructor(props) {
     super(props);
     autoBind(this);
@@ -31,7 +33,6 @@ export default class MatchFinder extends React.Component {
       const newState = JSON.parse(message.data);
       newState.loading = false;
       newState.postMatchOpen = newState.state === 'finished';
-      newState.copied = false;
       this.setState(newState);
     };
   }
@@ -85,7 +86,7 @@ export default class MatchFinder extends React.Component {
   }
 
   render() {
-    if (this.state.state == undefined) {
+    if (this.state.state === undefined) {
       return <CircularProgress color="secondary" />;
     }
 
@@ -181,30 +182,21 @@ export default class MatchFinder extends React.Component {
           <DialogTitle>Your match details</DialogTitle>
           <DialogContent>
             {this.renderOpponentDetails()}
-            <Tooltip
-              open={this.state.copied}
-              disableFocusListener
-              disableHoverListener
-              disableTouchListener
-              placement="top"
-              title="Copied"
+            <CopyToClipboard
+              text={this.state.opponent.id}
+              onCopy={() => {
+                this.props.enqueueSnackbar('Copied');
+                this.steamIdInput.select();
+              }}
             >
-              <CopyToClipboard
-                text={this.state.opponent.id}
-                onCopy={() => {
-                  this.setState({ copied: true });
-                  this.steamIdInput.select();
-                }}
-              >
-                <TextField
-                  label="Copy Steam ID to clipboard"
-                  margin="normal"
-                  variant="outlined"
-                  value={this.state.opponent.id}
-                  inputRef={input => { this.steamIdInput = input}}
-                />
-              </CopyToClipboard>
-            </Tooltip>
+              <TextField
+                label="Copy Steam ID to clipboard"
+                margin="normal"
+                variant="outlined"
+                value={this.state.opponent.id}
+                inputRef={input => { this.steamIdInput = input}}
+              />
+            </CopyToClipboard>
           </DialogContent>
         </Dialog>
       </>
@@ -212,5 +204,8 @@ export default class MatchFinder extends React.Component {
   }
 }
 
+MatchFinder.propTypes = {
+  enqueueSnackbar: PropTypes.func.isRequired,
+};
 
-
+export default withSnackbar(MatchFinder);

@@ -41,6 +41,7 @@
     "graphql": "^14.5.8",
     "graphql-tag": "^2.10.1",
     "lodash": "^4.17.15",
+    "notistack": "^0.9.5",
     "react-autobind": "^1.0.6",
     "react-copy-to-clipboard": "^5.0.1",
     "react-router-dom": "^5.1.2",
