@@ -30,23 +30,39 @@ class UpdateOrCreateSelectedHero(graphene.Mutation):
     class Arguments:
         hero_id = graphene.ID()
         matchup_ids = graphene.List(graphene.ID)
+        is_switched_on = graphene.Boolean()
 
     selected_hero = graphene.Field(SelectedHeroType)
 
-    def mutate(root, info, hero_id, matchup_ids):
+    def mutate(root, info, hero_id, matchup_ids=None, is_switched_on=None):
+        defaults = {}
+
+        if is_switched_on is not None:
+            defaults = {'is_switched_on': is_switched_on}
+
         selected_hero, created = SelectedHero.objects.get_or_create(
             user=info.context.user,
             hero_id=hero_id,
+            defaults=defaults,
         )
 
-        if created and not matchup_ids:
+        if created and matchup_ids is None:
             matchup_ids = (
                 Hero.objects
                     .lane_occupants('mid')
                     .values_list('id', flat=True)
             )
 
-        selected_hero.matchups.set(matchup_ids)
+        if (
+            is_switched_on is not None and
+            selected_hero.is_switched_on != is_switched_on
+        ):
+            selected_hero.is_switched_on = is_switched_on
+            selected_hero.save()
+
+        if matchup_ids is not None:
+            selected_hero.matchups.set(matchup_ids)
+
         return UpdateOrCreateSelectedHero(selected_hero=selected_hero)
 
 

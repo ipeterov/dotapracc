@@ -6,7 +6,7 @@ import gql from 'graphql-tag';
 
 import {
   Card, CardContent, Grid, GridList, GridListTile, CardHeader, Avatar,
-  IconButton, Typography, CircularProgress, Button, ButtonGroup,
+  IconButton, Typography, CircularProgress, Button, ButtonGroup, Switch,
 } from "@material-ui/core";
 import CloseIcon from '@material-ui/icons/Close';
 
@@ -15,6 +15,7 @@ export const SELECTED_HERO_FRAGMENT = gql`
   fragment selectedHero on SelectedHeroType {
     __typename
     id
+    isSwitchedOn
     matchups { __typename id }
     hero {
       __typename
@@ -30,13 +31,15 @@ export const SELECTED_HERO_FRAGMENT = gql`
 `;
 
 export const UPDATE_OR_CREATE_SELECTED_HERO = gql`
-  mutation UpdateOrCreateSelectedHero(
-    $heroId: ID,
+  mutation UpdateSelectedHero(
+    $heroId: ID!,
     $matchupIds: [ID],
+    $isSwitchedOn: Boolean,
   ) {
     updateOrCreateSelectedHero(
       heroId: $heroId,
       matchupIds: $matchupIds,
+      isSwitchedOn: $isSwitchedOn,
     ) {
       selectedHero { ...selectedHero }
     }
@@ -85,18 +88,24 @@ class SelectedHero extends React.Component {
     return { filter: `grayscale(${greyscalePercent}%)` }
   }
 
-  setHeroes(selectedHeroOriginal, heroIds) {
-    const selectedHero = _.cloneDeep(selectedHeroOriginal);
+  update(updates) {
+    const selectedHero = _.cloneDeep(this.props.selectedHero);
+    const variables = { heroId: selectedHero.hero.id };
 
-    selectedHero.matchups = heroIds.map(
-      heroId => ({ id: heroId, __typename: 'HeroType' })
-    );
+    if ('heroIds' in updates) {
+      selectedHero.matchups = updates.heroIds.map(
+        heroId => ({ id: heroId, __typename: 'HeroType' })
+      );
+      variables.matchupIds = updates.heroIds;
+    }
+
+    if ('isSwitchedOn' in updates) {
+      selectedHero.isSwitchedOn = updates.isSwitchedOn;
+      variables.isSwitchedOn = updates.isSwitchedOn;
+    }
 
     this.props.mutate({
-      variables: {
-        heroId: selectedHero.hero.id,
-        matchupIds: heroIds,
-      },
+      variables,
       optimisticResponse: {
         __typename: 'Mutation',
         updateOrCreateSelectedHero: {
@@ -118,7 +127,7 @@ class SelectedHero extends React.Component {
         newMatchups = _.difference(matchups, heroIds);
       }
 
-      this.setHeroes(this.props.selectedHero, newMatchups);
+      this.update({ heroIds: newMatchups });
     };
   }
 
@@ -145,6 +154,12 @@ class SelectedHero extends React.Component {
             }
             action={
               <div>
+                <Switch
+                  checked={selectedHero.isSwitchedOn}
+                  onChange={(event) => {
+                    this.update({ isSwitchedOn: event.target.checked });
+                  }}
+                />
                 <IconButton onClick={
                   () => this.props.handleDelete(selectedHero.id)
                 }>
@@ -224,13 +239,13 @@ class SelectedHero extends React.Component {
                 <ButtonGroup variant="text" size="medium">
                   <Button onClick={() => {
                     const ids = this.getIdArray(allHeroes);
-                    this.setHeroes(selectedHero, ids)
+                    this.update({ heroIds: ids });
                   }
                   }>
                     Add all
                   </Button>
                   <Button onClick={() => {
-                    this.setHeroes(selectedHero, [])
+                    this.update({ heroIds: [] });
                   }}>
                     Clear
                   </Button>

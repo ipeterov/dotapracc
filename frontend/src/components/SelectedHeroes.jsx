@@ -55,13 +55,8 @@ class SelectedHeroes extends React.Component {
     this.setState({ adding: true },
       () => {
         this.props.updateOrCreate({
-          variables: {
-            heroId,
-            matchupIds: [],
-          },
-          refetchQueries: [
-            { query: QUERY },
-          ],
+          variables: { heroId },
+          refetchQueries: [{ query: QUERY }],
           awaitRefetchQueries: true,
         }).then(() => {
           const added = [heroId].concat(this.state.added);

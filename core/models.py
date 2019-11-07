@@ -107,6 +107,9 @@ class SelectedHeroQuerySet(models.QuerySet):
                 reverse[matchup].append(hero)
         return reverse
 
+    def active(self):
+        return self.filter(is_switched_on=True)
+
 
 class SelectedHero(models.Model):
     user = models.ForeignKey(
@@ -118,6 +121,7 @@ class SelectedHero(models.Model):
     matchups = models.ManyToManyField(
         Hero, blank=True, related_name='+',
     )
+    is_switched_on = models.BooleanField(default=True)
 
     objects = SelectedHeroQuerySet.as_manager()
 
@@ -238,8 +242,8 @@ class PlayerSearch(models.Model):
         pass
 
     def hero_pairs(self, other):
-        self_heroes = self.user.selected_heroes.as_dict()
-        other_reverse = other.user.selected_heroes.as_reverse_dict()
+        self_heroes = self.user.selected_heroes.active().as_dict()
+        other_reverse = other.user.selected_heroes.active().as_reverse_dict()
 
         pairs = []
         for hero, matchups in self_heroes.items():
