@@ -82,9 +82,22 @@ class DeleteSelectedHero(graphene.Mutation):
         return DeleteSelectedHero(ok=True)
 
 
+class ToggleSelectedHeroes(graphene.Mutation):
+    class Arguments:
+        toggle_to = graphene.Boolean()
+
+    ok = graphene.Boolean()
+
+    def mutate(root, info, toggle_to):
+        user = info.context.user
+        user.selected_heroes.update(is_switched_on=toggle_to)
+        return ToggleSelectedHeroes(ok=True)
+
+
 class Mutations(graphene.ObjectType):
     update_or_create_selected_hero = UpdateOrCreateSelectedHero.Field()
     delete_selected_hero = DeleteSelectedHero.Field()
+    toggle_selected_heroes = ToggleSelectedHeroes.Field()
 
 
 class Query(graphene.ObjectType):

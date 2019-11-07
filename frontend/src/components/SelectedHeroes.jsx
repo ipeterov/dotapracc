@@ -6,7 +6,7 @@ import { graphql } from '@apollo/react-hoc';
 import { compose } from 'recompose';
 import gql from 'graphql-tag'
 
-import { Grid, CircularProgress, Typography } from "@material-ui/core";
+import { Grid, CircularProgress, Typography, Button } from "@material-ui/core";
 
 import SelectedHero, {
   SELECTED_HERO_FRAGMENT, UPDATE_OR_CREATE_SELECTED_HERO,
@@ -35,6 +35,12 @@ const QUERY = gql`
 const DELETE_SELECTED_HERO = gql`
   mutation DeleteSelectedHero($selectedHeroId: ID) {
     deleteSelectedHero(selectedHeroId: $selectedHeroId) { ok }
+  }
+`;
+
+const TOGGLE_SELECTED_HEROES = gql`
+  mutation ToggleSelectedHeroes($toggleTo: Boolean) {
+    toggleSelectedHeroes(toggleTo: $toggleTo) { ok }
   }
 `;
 
@@ -88,6 +94,15 @@ class SelectedHeroes extends React.Component {
     );
   }
 
+  handleToggleSelectedHeroes(toggleTo) {
+    this.props.toggleSelectedHeroes({
+      variables: { toggleTo },
+      refetchQueries: [
+        { query: QUERY }
+      ]
+    });
+  }
+
   render() {
     const { data } = this.props;
     const { loading, error } = data;
@@ -108,10 +123,24 @@ class SelectedHeroes extends React.Component {
     return (
       <Grid container spacing={2}>
         <Grid item>
-          <AddHeroDialog
-            handleAdd={this.handleAdd}
-            allHeroes={data.allHeroes}
-          />
+          <Grid container spacing={2}>
+            <Grid item>
+              <AddHeroDialog
+                handleAdd={this.handleAdd}
+                allHeroes={data.allHeroes}
+              />
+            </Grid>
+            <Grid item>
+              <Button onClick={() => this.handleToggleSelectedHeroes(true)}>
+                Switch all heroes on
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button onClick={() => this.handleToggleSelectedHeroes(false)}>
+                Switch all heroes off
+              </Button>
+            </Grid>
+          </Grid>
         </Grid>
         {
           data.viewer.selectedHeroes.length === 0 && (
@@ -160,4 +189,5 @@ export default compose(
   graphql(QUERY),
   graphql(DELETE_SELECTED_HERO, {name: 'delete'}),
   graphql(UPDATE_OR_CREATE_SELECTED_HERO, {name: 'updateOrCreate'}),
+  graphql(TOGGLE_SELECTED_HEROES, {name: 'toggleSelectedHeroes'}),
 )(SelectedHeroes);

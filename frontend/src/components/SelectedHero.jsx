@@ -149,7 +149,11 @@ class SelectedHero extends React.Component {
             avatar={
               <Avatar
                 src={MEDIA_PREFIX + selectedHero.hero.picture}
-                style={{ width: '80px', height: '80px' }}
+                style={{
+                  width: '80px',
+                  height: '80px',
+                  filter: `grayscale(${selectedHero.isSwitchedOn ? 0 : 100}%)`
+                }}
               />
             }
             action={
@@ -185,10 +189,9 @@ class SelectedHero extends React.Component {
               }
               <Grid item>
                 <Button
-                  onClick={() => {
-                    this.setState({matchupsExpanded: !this.state.matchupsExpanded});
-                    console.log(this.state);
-                  }}
+                  onClick={() => this.setState(
+                    {matchupsExpanded: !this.state.matchupsExpanded}
+                  )}
                 >
                   {
                     this.state.matchupsExpanded ?
