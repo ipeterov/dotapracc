@@ -94,10 +94,27 @@ class ToggleSelectedHeroes(graphene.Mutation):
         return ToggleSelectedHeroes(ok=True)
 
 
+class UpdateViewerProfile(graphene.Mutation):
+    class Arguments:
+        profile_text = graphene.String()
+
+    viewer = graphene.Field(UserType)
+
+    def mutate(root, info, profile_text=None):
+        user = info.context.user
+
+        if profile_text is not None:
+            user.profile_text = profile_text
+
+        user.save()
+        return UpdateViewerProfile(viewer=user)
+
+
 class Mutations(graphene.ObjectType):
     update_or_create_selected_hero = UpdateOrCreateSelectedHero.Field()
     delete_selected_hero = DeleteSelectedHero.Field()
     toggle_selected_heroes = ToggleSelectedHeroes.Field()
+    update_viewer_profile = UpdateViewerProfile.Field()
 
 
 class Query(graphene.ObjectType):

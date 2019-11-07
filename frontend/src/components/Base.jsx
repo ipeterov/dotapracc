@@ -14,7 +14,7 @@ import {
 } from '@material-ui/core';
 
 import About from './About.jsx';
-import SelectedHeroes from './SelectedHeroes.jsx';
+import Profile from './Profile.jsx';
 import MatchFinder from './MatchFinder.jsx';
 
 
@@ -164,7 +164,7 @@ export default function Base() {
             <About />
           </Route>
           <Route path="/">
-            <SelectedHeroes />
+            <Profile />
           </Route>
         </Switch>
       </Container>

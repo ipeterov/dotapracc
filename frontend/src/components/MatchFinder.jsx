@@ -18,15 +18,7 @@ export default class MatchFinder extends React.Component {
     super(props);
     autoBind(this);
 
-    this.state = {
-      loading: null,
-      postMatchOpen: false,
-      state: null,
-      startedAt: null,
-      opponent: {},
-      heroPairs: [],
-      copied: false,
-    };
+    this.state = {};
 
     const prefix = process.env.NODE_ENV === 'development' ? 'ws' : 'wss';
     this.sock = new W3CWebSocket(`${prefix}://${window.location.host}/ws/find_match`);
@@ -36,49 +28,20 @@ export default class MatchFinder extends React.Component {
 
   componentDidMount() {
     this.sock.onmessage = (message) => {
-      const {
-        state,
-        startedAt,
-        opponent,
-        heroPairs,
-      } = JSON.parse(message.data);
-      const loading = false;
-      const postMatchOpen = state === 'finished';
-      const copied = false;
-      this.setState({
-        state,
-        startedAt,
-        opponent,
-        heroPairs,
-        loading,
-        postMatchOpen,
-        copied,
-      });
+      const newState = JSON.parse(message.data);
+      newState.loading = false;
+      newState.postMatchOpen = newState.state === 'finished';
+      newState.copied = false;
+      this.setState(newState);
     };
   }
 
-  startSearch() {
-    this.setState({ loading: true }, () => {
-      this.sock.send('start_search');
-    });
-  }
-
-  cancelSearch() {
-    this.setState({ loading: true }, () => {
-      this.sock.send('cancel_search');
-    });
-  }
-
-  acceptMatch() {
-    this.setState({ loading: true }, () => {
-      this.sock.send('accept_match');
-    });
-  }
-
-  declineMatch() {
-    this.setState({ loading: true }, () => {
-      this.sock.send('decline_match');
-    });
+  sendCommand(command) {
+    return () => {
+      this.setState({ loading: true }, () => {
+        this.sock.send(command);
+      });
+    };
   }
 
   renderOpponentDetails() {
@@ -99,6 +62,13 @@ export default class MatchFinder extends React.Component {
               {this.state.opponent.mmrEstimate}
             </TableCell>
           </TableRow>
+          <TableRow>
+            <TableCell align="left">Profile text</TableCell>
+            <TableCell />
+            <TableCell align="right">
+              {this.state.opponent.profileText}
+            </TableCell>
+          </TableRow>
           {_.map(this.state.heroPairs, (heroPair) => {
               const [hero, matchup] = heroPair;
               return (
@@ -115,7 +85,7 @@ export default class MatchFinder extends React.Component {
   }
 
   render() {
-    if (this.state.state === null) {
+    if (this.state.state == undefined) {
       return <CircularProgress color="secondary" />;
     }
 
@@ -150,7 +120,7 @@ export default class MatchFinder extends React.Component {
           </Grid>
           <Grid item >
             <MyButton
-              onClick={this.cancelSearch}
+              onClick={this.sendCommand('cancel_search')}
               variant="contained"
               color="secondary"
               loading={this.state.loading}
@@ -171,7 +141,7 @@ export default class MatchFinder extends React.Component {
             </DialogContent>
             <DialogActions>
               <MyButton
-                onClick={this.acceptMatch}
+                onClick={this.sendCommand('accept_match')}
                 variant="contained"
                 color="primary"
                 loading={this.state.loading}
@@ -179,7 +149,7 @@ export default class MatchFinder extends React.Component {
                 Accept
               </MyButton>
               <MyButton
-                onClick={this.declineMatch}
+                onClick={this.sendCommand('decline_match')}
                 variant="contained"
                 color="secondary"
                 loading={this.state.loading}
@@ -197,7 +167,7 @@ export default class MatchFinder extends React.Component {
     return (
       <>
         <MyButton
-          onClick={this.startSearch}
+          onClick={this.sendCommand('start_search')}
           variant="contained"
           color="secondary"
           loading={this.state.loading}

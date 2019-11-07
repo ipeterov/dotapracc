@@ -56,6 +56,8 @@ class SteamUser(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
+    profile_text = models.TextField(blank=True, default='')
+
     objects = SteamUserManager()
 
     def __str__(self):

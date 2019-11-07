@@ -4,7 +4,7 @@ import autoBind from 'react-autobind';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/react-hoc';
 import { compose } from 'recompose';
-import gql from 'graphql-tag'
+import gql from 'graphql-tag';
 
 import { Grid, CircularProgress, Typography, Button } from "@material-ui/core";
 
@@ -116,7 +116,7 @@ class SelectedHeroes extends React.Component {
 
     if (data.viewer == null) return (
       <Typography>
-        Log in to be able to configure your profile.
+        Log in to be able to train heroes.
       </Typography>
     );
 

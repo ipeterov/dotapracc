@@ -193,15 +193,17 @@ class PlayerSearch(models.Model):
         return f'{self.user} started at {self.started_at}'
 
     def as_dict(self):
+        match = self.match
         return {
             'state': self.state,
             'startedAt': self.started_at and self.started_at.isoformat(),
-            'heroPairs': self.match and self.hero_pairs(self.match),
+            'heroPairs': match and self.hero_pairs(match),
             'opponent': {
-                'id': self.match.user.steam32id,
-                'personaName': self.match.user.personaname,
-                'mmrEstimate': self.match.user.mmr_estimate,
-            } if self.match else {},
+                'id': match.user.steam32id,
+                'personaName': match.user.personaname,
+                'mmrEstimate': match.user.mmr_estimate,
+                'profileText': match.user.profile_text,
+            } if match else {},
         }
 
     def dumps(self):
