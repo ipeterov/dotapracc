@@ -15,13 +15,10 @@ from authentication.models import SteamUser
 class HeroQuerySet(models.QuerySet):
     def lane_occupants(self, lane):
         assert lane in Hero.FIELD_MAP
-        other_lanes = {l for l in Hero.FIELD_MAP if l != lane}
-        query = models.Q()
-        for other_lane in other_lanes:
-            condition = Hero.FIELD_MAP[lane] + '__gte'
-            value = models.F(Hero.FIELD_MAP[other_lane])
-            query &= models.Q(**{condition: value})
-        return self.filter(query)
+        condition = {
+            Hero.FIELD_MAP[lane] + '__gte': settings.LANE_PRESENCE_CUTOFF
+        }
+        return self.filter(**condition)
 
 
 class Hero(models.Model):

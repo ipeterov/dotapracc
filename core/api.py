@@ -38,6 +38,14 @@ class UpdateOrCreateSelectedHero(graphene.Mutation):
             user=info.context.user,
             hero_id=hero_id,
         )
+
+        if created and not matchup_ids:
+            matchup_ids = (
+                Hero.objects
+                    .lane_occupants('mid')
+                    .values_list('id', flat=True)
+            )
+
         selected_hero.matchups.set(matchup_ids)
         return UpdateOrCreateSelectedHero(selected_hero=selected_hero)
 
