@@ -24,7 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '8l6h3bm&2_o2pjj295f(u*f+572mhdv#ds)y*+qr5t=7ca1=1t'
+SECRET_KEY = os.environ['SECRET_KEY']
 
 
 # Application definition
@@ -145,7 +145,7 @@ STATIC_URL = '/static/'
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
 SOCIAL_AUTH_LOGIN_ERROR_URL = '/'
 SOCIAL_AUTH_POSTGRES_JSONFIELD = True
-SOCIAL_AUTH_STEAM_API_KEY = '76B443C4F8CCE0375BADA98502E49A3D'
+SOCIAL_AUTH_STEAM_API_KEY = os.environ['STEAM_KEY']
 SOCIAL_AUTH_STEAM_EXTRA_DATA = ['player']
 
 AUTH_USER_MODEL = 'authentication.SteamUser'
@@ -213,7 +213,7 @@ CELERY_RESULT_BACKEND = os.environ['REDISTOGO_URL']
 
 OPENDOTA_API_URL = 'https://api.opendota.com/'
 OPENDOTA_PUBLIC_API_URL = f'{OPENDOTA_API_URL}api/'
-OPENDOTA_API_KEY = 'fb3453ae-3631-49a9-b719-8681d4156fa8'
+OPENDOTA_API_KEY = os.environ['OPENDOTA_KEY']
 OPENDOTA_IRREGULAR_NAMES = {
     'io': 'wisp',
     'clockwerk': 'rattletrap',
