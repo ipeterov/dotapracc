@@ -6,7 +6,7 @@
         <option name="rootFolder" value="$MODULE_DIR$" />
         <option name="settingsModule" value="dotapracc/settings/dev.py" />
         <option name="manageScript" value="manage.py" />
-        <option name="environment" value="&lt;map&gt;&#10;  &lt;entry&gt;&#10;    &lt;string&gt;REDISTOGO_URL&lt;/string&gt;&#10;    &lt;string&gt;redis://h:redis://redistogo:f94a37a46187c19144ce7e22dbe86c1a@hammerjaw.redistogo.com:11653/@ec2-3-213-149-16.compute-1.amazonaws.com:29299&lt;/string&gt;&#10;  &lt;/entry&gt;&#10;&lt;/map&gt;" />
+        <option name="environment" value="&lt;map&gt;&#10;  &lt;entry&gt;&#10;    &lt;string&gt;OPENDOTA_KEY&lt;/string&gt;&#10;    &lt;string&gt;56a641c1-aaba-440f-979f-6563397aa574&lt;/string&gt;&#10;  &lt;/entry&gt;&#10;  &lt;entry&gt;&#10;    &lt;string&gt;REDISTOGO_URL&lt;/string&gt;&#10;    &lt;string&gt;redis://h:redis://redistogo:f94a37a46187c19144ce7e22dbe86c1a@hammerjaw.redistogo.com:11653/@ec2-3-213-149-16.compute-1.amazonaws.com:29299&lt;/string&gt;&#10;  &lt;/entry&gt;&#10;  &lt;entry&gt;&#10;    &lt;string&gt;SECRET_KEY&lt;/string&gt;&#10;    &lt;string&gt;32OJJaL/8HOLAtva53l18Jdnap8WWeluw/Fjbm4OiOs=&lt;/string&gt;&#10;  &lt;/entry&gt;&#10;  &lt;entry&gt;&#10;    &lt;string&gt;STEAM_KEY&lt;/string&gt;&#10;    &lt;string&gt;6F797E00D64FDE2B1DE0AE02D9B27257&lt;/string&gt;&#10;  &lt;/entry&gt;&#10;&lt;/map&gt;" />
         <option name="doNotUseTestRunner" value="false" />
         <option name="trackFilePattern" value="" />
       </configuration>

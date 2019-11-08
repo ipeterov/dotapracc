@@ -1,11 +1,11 @@
 from channels.generic.websocket import WebsocketConsumer
 
 from .models import PlayerSearch
+from .tasks import invite_players
 
 
 class MatchFinderConsumer(WebsocketConsumer):
     def websocket_send(self, event):
-        print('sending from worker: ', event['message'])
         self.send(event['message'])
 
     def current_search(self):
@@ -32,13 +32,22 @@ class MatchFinderConsumer(WebsocketConsumer):
 
         if command == 'start_search':
             current_search = PlayerSearch(user=self.scope['user'])
+
         elif command == 'cancel_search':
             current_search.cancel_search()
+
         elif command == 'accept_match':
             current_search.accept_match()
             if current_search.match.state == 'accepted_match':
                 current_search.set_finished()
                 current_search.match.set_finished()
+
+                steam_ids = [
+                    current_search.user.steamid,
+                    current_search.match.user.steamid,
+                ]
+                invite_players.delay(steam_ids)
+
         elif command == 'decline_match':
             current_search.decline_match()
             current_search.match.decline_match()

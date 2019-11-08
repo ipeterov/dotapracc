@@ -1,4 +1,6 @@
 import json
+import time
+import random
 from collections import defaultdict
 
 from asgiref.sync import async_to_sync
@@ -260,3 +262,22 @@ class PlayerSearch(models.Model):
             return False
 
         return True
+
+
+class BotAccountManager(models.Manager):
+    def free_bot(self):
+        while True:
+            free = list(self.filter(is_busy=False))
+
+            if not free:
+                time.sleep(1)
+            else:
+                return random.choice(free)
+
+
+class BotAccount(models.Model):
+    login = models.CharField(max_length=64)
+    password = models.CharField(max_length=128)
+    is_busy = models.BooleanField()
+
+    objects = BotAccountManager()
