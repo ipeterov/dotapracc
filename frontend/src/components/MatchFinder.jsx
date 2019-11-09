@@ -86,14 +86,14 @@ class MatchFinder extends React.Component {
             </TableCell>
           </TableRow>
           {_.map(this.state.heroPairs, (heroPair) => {
-              const [hero, matchup] = heroPair;
-              return (
-                <TableRow key={hero + matchup} >
-                  <TableCell align="left">{hero}</TableCell>
-                  <TableCell align="center">vs</TableCell>
-                  <TableCell align="right">{matchup}</TableCell>
-                </TableRow>
-              );
+            const [hero, matchup] = heroPair;
+            return (
+              <TableRow key={hero + matchup} >
+                <TableCell align="left">{hero}</TableCell>
+                <TableCell align="center">vs</TableCell>
+                <TableCell align="right">{matchup}</TableCell>
+              </TableRow>
+            );
           })}
         </TableBody>
       </Table>
