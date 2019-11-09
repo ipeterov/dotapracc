@@ -15,6 +15,10 @@ import {CopyToClipboard} from 'react-copy-to-clipboard';
 import MyButton from './MyButton.jsx';
 
 
+const prefix = process.env.NODE_ENV === 'development' ? 'ws' : 'wss';
+const wsUrl = `${prefix}://${window.location.host}/ws/find_match`
+
+
 class MatchFinder extends React.Component {
   constructor(props) {
     super(props);
@@ -22,18 +26,29 @@ class MatchFinder extends React.Component {
 
     this.state = {};
 
-    const prefix = process.env.NODE_ENV === 'development' ? 'ws' : 'wss';
-    this.sock = new W3CWebSocket(`${prefix}://${window.location.host}/ws/find_match`);
+    this.connect();
 
     this.steamIdInput = React.createRef();
   }
 
-  componentDidMount() {
+  connect() {
+    this.sock = new W3CWebSocket(wsUrl);
+
     this.sock.onmessage = (message) => {
       const newState = JSON.parse(message.data);
       newState.loading = false;
       newState.postMatchOpen = newState.state === 'finished';
       this.setState(newState);
+    };
+
+    this.sock.onclose = (e) => {
+      setTimeout(() => {
+        this.connect();
+      }, 1000);
+    };
+
+    this.sock.onerror = (err) => {
+      this.sock.close();
     };
   }
 
