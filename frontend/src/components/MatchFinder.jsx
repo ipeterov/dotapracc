@@ -1,34 +1,36 @@
-import _ from 'lodash';
 import React from 'react';
-import PropTypes from 'prop-types';
 import ReactTimeAgo from 'react-time-ago';
 import autoBind from 'react-autobind';
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
-import { withSnackbar } from 'notistack';
 
 import {
-  Typography, Dialog, DialogActions, DialogContent, CircularProgress, Grid,
-  DialogTitle, Table, TableBody, TableRow, TableCell, TextField, Tooltip,
+  Typography, Dialog, DialogActions, DialogContent, Grid, DialogTitle, Table,
+  TableBody, TableRow, TableCell, LinearProgress,
 } from '@material-ui/core';
-import {CopyToClipboard} from 'react-copy-to-clipboard';
 
 import MyButton from './MyButton.jsx';
 
+
+const SEARCHING = 'searching';
+const FOUND_MATCH = 'found_match';
+const ACCEPTED_MATCH = 'accepted_match';
+const LOBBY_SETUP = 'lobby_setup';
+const IN_LOBBY = 'in_lobby';
 
 const prefix = process.env.NODE_ENV === 'development' ? 'ws' : 'wss';
 const wsUrl = `${prefix}://${window.location.host}/ws/find_match`
 
 
-class MatchFinder extends React.Component {
+export default class MatchFinder extends React.Component {
   constructor(props) {
     super(props);
     autoBind(this);
 
-    this.state = {};
+    this.state = {
+      connected: false,
+    };
 
     this.connect();
-
-    this.steamIdInput = React.createRef();
   }
 
   connect() {
@@ -36,25 +38,30 @@ class MatchFinder extends React.Component {
 
     this.sock.onmessage = (message) => {
       const newState = JSON.parse(message.data);
-      newState.loading = false;
-      newState.postMatchOpen = newState.state === 'finished';
+      console.log(message);
+      newState.waitingForResponse = false;
       this.setState(newState);
     };
 
-    this.sock.onclose = (e) => {
+    this.sock.onopen = () => {
+      this.setState({ connected: true });
+    };
+
+    this.sock.onclose = () => {
+      this.setState({ connected: false });
       setTimeout(() => {
         this.connect();
       }, 1000);
     };
 
-    this.sock.onerror = (err) => {
-      this.sock.close();
-    };
+    // this.sock.onerror = () => {
+    //   this.sock.close();
+    // };
   }
 
   sendCommand(command) {
     return () => {
-      this.setState({ loading: true }, () => {
+      this.setState({ waitingForResponse: true }, () => {
         this.sock.send(command);
       });
     };
@@ -66,161 +73,190 @@ class MatchFinder extends React.Component {
         <TableBody>
           <TableRow>
             <TableCell align="left">Opponent</TableCell>
-            <TableCell />
             <TableCell align="right">
               {this.state.opponent.personaName}
             </TableCell>
           </TableRow>
           <TableRow>
             <TableCell align="left">MMR estimate (from OpenDota)</TableCell>
-            <TableCell />
             <TableCell align="right">
               {this.state.opponent.mmrEstimate}
             </TableCell>
           </TableRow>
           <TableRow>
             <TableCell align="left">Profile text</TableCell>
-            <TableCell />
             <TableCell align="right">
               {this.state.opponent.profileText}
             </TableCell>
           </TableRow>
-          {_.map(this.state.heroPairs, (heroPair) => {
-            const [hero, matchup] = heroPair;
-            return (
-              <TableRow key={hero + matchup} >
-                <TableCell align="left">{hero}</TableCell>
-                <TableCell align="center">vs</TableCell>
-                <TableCell align="right">{matchup}</TableCell>
-              </TableRow>
-            );
-          })}
+          <TableRow>
+            <TableCell align="left">Possible matchups</TableCell>
+            <TableCell align="right">
+              {this.state.heroPairs.length}
+            </TableCell>
+          </TableRow>
         </TableBody>
       </Table>
     );
   }
 
+  renderSearchButton() {
+    return (
+      <MyButton
+        onClick={this.sendCommand('start_search')}
+        variant="contained"
+        color="secondary"
+        loading={this.state.waitingForResponse}
+      >
+        Find match
+      </MyButton>
+    );
+  }
+
+  renderCancelButton() {
+    const startedAt = new Date(this.state.startedAt);
+    return (
+      <Grid
+        container
+        spacing={1}
+        alignItems="center"
+      >
+        <Grid item >
+          <Typography variant="overline">
+            Searching for:{' '}
+            <ReactTimeAgo
+              date={startedAt}
+              updateInterval={500}
+              timeStyle={{
+                gradation: [
+                  {
+                    format: (value) => {
+                      const td = Math.trunc((new Date() - value) / 1000);
+                      const minutes = Math.floor(td / 60);
+                      const seconds = (td % 60).toString().padStart(2, '0');
+                      return `${minutes}:${seconds}`;
+                    },
+                  },
+                ],
+              }}
+            />
+          </Typography>
+        </Grid>
+        <Grid item >
+          <MyButton
+            onClick={this.sendCommand('cancel')}
+            variant="contained"
+            color="secondary"
+            loading={this.state.waitingForResponse}
+          >
+            Cancel search
+          </MyButton>
+        </Grid>
+      </Grid>
+    );
+  }
+
+  renderFoundMatchDialog() {
+    return (
+      <Dialog open={true}>
+        <DialogTitle>Found match</DialogTitle>
+        <DialogContent>
+          {this.renderOpponentDetails()}
+        </DialogContent>
+        <DialogActions>
+          <MyButton
+            onClick={this.sendCommand('accept_match')}
+            variant="contained"
+            color="primary"
+            loading={this.state.waitingForResponse}
+          >
+            Accept
+          </MyButton>
+          <MyButton
+            onClick={this.sendCommand('cancel')}
+            variant="contained"
+            color="secondary"
+            loading={this.state.waitingForResponse}
+          >
+            Decline
+          </MyButton>
+        </DialogActions>
+      </Dialog>
+    );
+  }
+
+  renderWaitingForAcceptDialog() {
+    return (
+      <Dialog open={true}>
+        <DialogTitle>Waiting for other player to accept</DialogTitle>
+        <DialogContent>
+          <LinearProgress />
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  renderWaitingForLobbyDialog() {
+    return (
+      <Dialog open={true}>
+        <DialogTitle>Bot dispatched to create lobby</DialogTitle>
+        <DialogContent>
+          <LinearProgress />
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  renderWaitingInLobbyDialog() {
+    return (
+      <Dialog open={true}>
+        <DialogTitle>Waiting for other player to join lobby</DialogTitle>
+        <DialogContent>
+          <LinearProgress />
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   render() {
-    if (this.state.state === undefined) {
-      return <CircularProgress color="secondary" />;
+    const state = this.state.state;
+
+    if (!this.state.connected) {
+      return <Typography>Connecting to dotapra.cc coordinator</Typography>;
     }
 
-    if (this.state.state === 'started_search') {
-      const startedAt = new Date(this.state.startedAt);
-      return (
-        <Grid
-          container
-          spacing={1}
-          alignItems="center"
-        >
-          <Grid item >
-            <Typography variant="overline">
-              Searching for:{' '}
-              <ReactTimeAgo
-                date={startedAt}
-                updateInterval={500}
-                timeStyle={{
-                  gradation: [
-                    {
-                      format: (value) => {
-                        const td = Math.trunc((new Date() - value) / 1000);
-                        const minutes = Math.floor(td / 60);
-                        const seconds = (td % 60).toString().padStart(2, '0');
-                        return `${minutes}:${seconds}`;
-                      },
-                    },
-                  ],
-                }}
-              />
-            </Typography>
-          </Grid>
-          <Grid item >
-            <MyButton
-              onClick={this.sendCommand('cancel_search')}
-              variant="contained"
-              color="secondary"
-              loading={this.state.loading}
-            >
-              Cancel search
-            </MyButton>
-          </Grid>
-        </Grid>
-        );
-    } else if (this.state.state === 'found_match') {
+    if (state === SEARCHING) {
+      return this.renderCancelButton();
+    } else if (state === FOUND_MATCH) {
       return (
         <>
           <Typography>Found match</Typography>
-          <Dialog open={true}>
-            <DialogTitle>Found match</DialogTitle>
-            <DialogContent>
-              {this.renderOpponentDetails()}
-            </DialogContent>
-            <DialogActions>
-              <MyButton
-                onClick={this.sendCommand('accept_match')}
-                variant="contained"
-                color="primary"
-                loading={this.state.loading}
-              >
-                Accept
-              </MyButton>
-              <MyButton
-                onClick={this.sendCommand('decline_match')}
-                variant="contained"
-                color="secondary"
-                loading={this.state.loading}
-              >
-                Decline
-              </MyButton>
-            </DialogActions>
-          </Dialog>
+          {this.renderFoundMatchDialog()}
         </>
       );
-    } else if (this.state.state === 'accepted_match') {
-      return <Typography>Waiting for other player to accept</Typography>;
+    } else if (state === ACCEPTED_MATCH) {
+      return (
+        <>
+          <Typography>Waiting for other player to accept</Typography>
+          {this.renderWaitingForAcceptDialog()}
+        </>
+      );
+    } else if (state === LOBBY_SETUP) {
+      return (
+        <>
+          <Typography>Setting up lobby</Typography>
+          {this.renderWaitingForLobbyDialog()}
+        </>
+      );
+    } else if (state === IN_LOBBY) {
+      return (
+        <>
+          <Typography>Waiting for other player to join</Typography>
+          {this.renderWaitingInLobbyDialog()}
+        </>
+      );
     }
 
-    return (
-      <>
-        <MyButton
-          onClick={this.sendCommand('start_search')}
-          variant="contained"
-          color="secondary"
-          loading={this.state.loading}
-        >
-          Find match
-        </MyButton>
-        <Dialog
-          open={this.state.postMatchOpen}
-          onClose={() => this.setState({ postMatchOpen: false })}
-        >
-          <DialogTitle>Your match details</DialogTitle>
-          <DialogContent>
-            {this.renderOpponentDetails()}
-            <CopyToClipboard
-              text={this.state.opponent.id}
-              onCopy={() => {
-                this.props.enqueueSnackbar('Copied');
-                this.steamIdInput.select();
-              }}
-            >
-              <TextField
-                label="Copy Steam ID to clipboard"
-                margin="normal"
-                variant="outlined"
-                value={this.state.opponent.id}
-                inputRef={input => { this.steamIdInput = input}}
-              />
-            </CopyToClipboard>
-          </DialogContent>
-        </Dialog>
-      </>
-    );
+    return this.renderSearchButton();
   }
 }
-
-MatchFinder.propTypes = {
-  enqueueSnackbar: PropTypes.func.isRequired,
-};
-
-export default withSnackbar(MatchFinder);

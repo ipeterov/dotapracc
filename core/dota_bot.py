@@ -38,7 +38,9 @@ def connect_with_retry(client, connect_retries=5):
 def invite(steam_ids, bot_account, lobby_name):
     client = SteamClient()
     dota = Dota2Client(client)
-    steam_ids = [int(steamid) for steamid in steam_ids]
+
+    steam_ids = {int(steamid) for steamid in steam_ids}
+    yielded = set()
 
     @client.on('connected')
     def log_in():
@@ -64,29 +66,39 @@ def invite(steam_ids, bot_account, lobby_name):
 
     @dota.on('lobby_changed')
     def handle_change(lobby):
-        invited_members = {
-            member.id: member for member in lobby.members
+        in_lobby = {
+            member.id for member in lobby.members
             if member.id in steam_ids
         }
-        pending = [
+        pending = {
             steamid for steamid in lobby.pending_invites
             if steamid in steam_ids
-        ]
+        }
+        leavers = steam_ids - (in_lobby | pending)
 
-        # Everyone joined
-        if len(invited_members) == len(steam_ids):
+        nonlocal yielded
+        to_yield = in_lobby - yielded
+        for steam_id in to_yield:
+            yielded.add(steam_id)
+            client.emit('info', 'in_lobby', steam_id)
+
+        if len(in_lobby) == len(steam_ids):
             dota.leave_practice_lobby()
 
-        # Someone didn't accept
-        if len(invited_members) + len(pending) < len(steam_ids):
+        if leavers:
+            leaver_id = list(leavers)[0]
             dota.destroy_lobby()
-
-        # if all(member.team != 4 for member in invited_members.values()):
-        #     dota.launch_practice_lobby()
+            client.emit('info', 'leaver', leaver_id)
 
     @dota.on('lobby_removed')
     def finish_cycle(lobby):
-        client.emit('cycle_finished')
+        client.emit('info', 'cycle_finished')
 
     connect_with_retry(client)
-    client.wait_event('cycle_finished')
+    while True:
+        args = client.wait_event('info')
+        if args[0] == 'cycle_finished':
+            return
+        else:
+            assert len(args) == 2
+            yield args

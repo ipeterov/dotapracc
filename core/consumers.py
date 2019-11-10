@@ -1,61 +1,54 @@
 from channels.generic.websocket import WebsocketConsumer
 
 from .models import PlayerSearch
-from .tasks import invite_players
 
 
 class MatchFinderConsumer(WebsocketConsumer):
     def websocket_send(self, event):
+        """Needed for PlayerSearch.push_to_websocket"""
         self.send(event['message'])
 
-    def current_search(self):
-        user = self.scope['user']
-        search = user.searches.active().first()
-        if not search:
-            search = PlayerSearch(state='not_searching')
-        return search
-
     def connect(self):
-        self.accept()
-        current_search = self.current_search()
-        if current_search and current_search.state != 'not_searching':
-            current_search.channel_name = self.channel_name
-            current_search.save()
-        self.send(current_search.dumps())
+        user = self.scope['user']
+        current_search = PlayerSearch.objects.current_search(user)
 
-    def disconnect(self, close_code):
-        pass
+        self.accept()
+
+        if current_search:
+            PlayerSearch.objects.update_channel(
+                current_search,
+                self.channel_name
+            )
 
     def receive(self, text_data=None, bytes_data=None):
         command = text_data
-        current_search = self.current_search()
+        assert command in {
+            'start_search',
+            'accept_match',
+            'cancel',
+        }
+
+        user = self.scope['user']
+        current_search = PlayerSearch.objects.current_search(user)
 
         if command == 'start_search':
-            current_search = PlayerSearch(user=self.scope['user'])
+            assert current_search is None
+            PlayerSearch.objects.create(
+                user=user,
+                channel_name=self.channel_name,
+            )
+            return
 
-        elif command == 'cancel_search':
-            current_search.cancel_search()
+        assert current_search is not None
 
-        elif command == 'accept_match':
-            current_search.accept_match()
-            if current_search.match.state == 'accepted_match':
-                current_search.set_finished()
-                current_search.match.set_finished()
+        PlayerSearch.objects.update_channel(
+            current_search,
+            self.channel_name
+        )
 
-                steam_ids = [
-                    current_search.user.steamid,
-                    current_search.match.user.steamid,
-                ]
-                invite_players.delay(steam_ids)
+        if command == 'accept_match':
+            PlayerSearch.objects.accept_match(current_search)
+        elif command == 'cancel':
+            PlayerSearch.objects.cancel(current_search)
 
-        elif command == 'decline_match':
-            current_search.decline_match()
-            current_search.match.decline_match()
 
-        current_search.channel_name = self.channel_name
-        current_search.save()
-        if current_search.match:
-            current_search.match.save()
-            current_search.match.push_to_websocket()
-
-        self.send(current_search.dumps())

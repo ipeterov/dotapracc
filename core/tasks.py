@@ -1,23 +1,35 @@
 from celery import shared_task
 
 from core.dota_bot import invite, busy
-from core.models import PlayerSearch, BotAccount
-from core.sync import HeroSyncer
 
 
 @shared_task
 def matchmaking():
+    from core.models import PlayerSearch
+
     PlayerSearch.objects.find_matches()
 
 
 @shared_task
-def invite_players(steam_ids, lobby_name='dotapra.cc'):
+def invite_players(steam_ids, lobby_name):
+    from authentication.models import SteamUser
+    from core.models import BotAccount, PlayerSearch
+
     bot_account = BotAccount.objects.free_bot()
     with busy(bot_account):
-        invite(steam_ids, bot_account, lobby_name)
+        for info, steam_id in invite(steam_ids, bot_account, lobby_name):
+            user = SteamUser.objects.get(steamid=steam_id)
+            search = PlayerSearch.objects.current_search(user)
+            if info == 'leaver':
+                PlayerSearch.objects.cancel(search)
+                break
+            elif info == 'in_lobby':
+                PlayerSearch.objects.join_lobby(search)
 
 
 @shared_task
 def sync_heroes():
+    from core.sync import HeroSyncer
+
     syncer = HeroSyncer()
     syncer.sync_heroes()

@@ -12,6 +12,7 @@ from django.db import models, transaction
 from django.utils.timezone import now
 
 from authentication.models import SteamUser
+from .tasks import invite_players
 
 
 class HeroQuerySet(models.QuerySet):
@@ -134,34 +135,100 @@ class SelectedHero(models.Model):
 class PlayerSearchManager(models.Manager):
     @transaction.atomic
     def find_matches(self):
-        searching = self.filter(state='started_search')
-
+        searching = self.filter(state=self.model.SEARCHING)
         for search in searching:
             for other in searching:
                 if search == other:
                     continue
 
-                if search.state != 'started_search' or other.state != 'started_search':
+                # State can change in this loop
+                if search.state == other.state != self.model.SEARCHING:
                     continue
 
                 if search.can_match_with(other):
-                    search.suggest_match(other)
-                    search.save()
-                    search.push_to_websocket()
-
-                    other.suggest_match(search)
-                    other.save()
-                    other.push_to_websocket()
+                    self.suggest_match(search, other)
 
     def active(self):
-        return self.filter(state__in={
-            'started_search',
-            'found_match',
-            'accepted_match',
-        })
+        return self.filter(state__in=self.model.ACTIVE_STATES)
+
+    def current_search(self, user):
+        return self.active().filter(user=user).first()
+
+    @staticmethod
+    def suggest_match(search1, search2):
+        search1.suggest_match(search2)
+        search1.save()
+        search2.suggest_match(search1)
+        search2.save()
+
+    def accept_match(self, search):
+        search.accept_match()
+        if search.match.state == self.model.ACCEPTED_MATCH:
+            search.to_lobby_setup()
+            search.match.to_lobby_setup()
+
+            steam_ids = [
+                search.user.steamid,
+                search.match.user.steamid,
+            ]
+            lobby_name = (
+                f'dotapra.cc - '
+                f'{search.user.personaname} & {search.match.user.personaname}'
+            )
+            invite_players.delay(steam_ids, lobby_name)
+
+            search.match.save()
+        search.save()
+
+    def join_lobby(self, search):
+        search.join_lobby()
+        if search.match.state == self.model.IN_LOBBY:
+            search.finalize()
+            search.match.finalize()
+            search.match.save()
+        search.save()
+
+    @staticmethod
+    def cancel(search):
+        search.cancel()
+        search.save()
+        if search.match:
+            search.match.back_to_search()
+            search.match.save()
+
+    @staticmethod
+    def update_channel(search, channel_name):
+        search.channel_name = channel_name
+        search.save()
 
 
 class PlayerSearch(models.Model):
+    SEARCHING = 'searching'
+    CANCELLED = 'cancelled'
+    FOUND_MATCH = 'found_match'
+    ACCEPTED_MATCH = 'accepted_match'
+    LOBBY_SETUP = 'lobby_setup'
+    IN_LOBBY = 'in_lobby'
+    SUCCESS = 'success'
+
+    STATE_CHOICES = (
+        (SEARCHING, 'Searching for a match'),
+        (CANCELLED, 'Cancelled search'),
+        (FOUND_MATCH, 'Found a match'),
+        (ACCEPTED_MATCH, 'Accepted the match'),
+        (LOBBY_SETUP, 'Setting up a lobby'),
+        (IN_LOBBY, 'In lobby'),
+        (SUCCESS, 'Successfully matched'),
+    )
+
+    ACTIVE_STATES = [
+        SEARCHING,
+        FOUND_MATCH,
+        ACCEPTED_MATCH,
+        LOBBY_SETUP,
+        IN_LOBBY,
+    ]
+
     user = models.ForeignKey(
         SteamUser, on_delete=models.CASCADE, related_name='searches',
     )
@@ -170,11 +237,10 @@ class PlayerSearch(models.Model):
         related_name='+',
     )
 
+    channel_name = models.CharField(max_length=64, blank=True, null=True)
     started_at = models.DateTimeField(auto_now_add=True)
     ended_at = models.DateTimeField(null=True, blank=True)
-    state = FSMField(default='started_search')
-
-    channel_name = models.CharField(max_length=64, blank=True, null=True)
+    state = FSMField(default=SEARCHING, choices=STATE_CHOICES, protected=True)
 
     objects = PlayerSearchManager()
 
@@ -182,11 +248,16 @@ class PlayerSearch(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=['user'],
-                condition=models.Q(state__in={
-                    'started_search',
-                    'found_match',
-                    'accepted_match',
-                }),
+                condition=models.Q(
+                    # Can't access variables here
+                    state__in=[
+                        'searching',
+                        'found_match',
+                        'accepted_match',
+                        'lobby_setup',
+                        'in_lobby',
+                    ]
+                ),
                 name='unique_active_search',
             ),
         ]
@@ -208,42 +279,18 @@ class PlayerSearch(models.Model):
             } if match else {},
         }
 
-    def dumps(self):
-        return json.dumps(self.as_dict())
-
     def push_to_websocket(self):
+        if not self.channel_name:
+            return
+
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.send)(
             self.channel_name,
             {
                 'type': 'websocket.send',
-                'message': self.dumps(),
+                'message': json.dumps(self.as_dict()),
             },
         )
-
-    @transition(field=state, source='started_search', target='cancelled')
-    def cancel_search(self):
-        self.ended_at = now()
-
-    @transition(field=state, source='started_search', target='found_match')
-    def suggest_match(self, other_search):
-        self.match = other_search
-
-    @transition(field=state, source='found_match', target='accepted_match')
-    def accept_match(self):
-        self.ended_at = now()
-
-    @transition(
-        field=state,
-        source=['found_match', 'accepted_match'],
-        target='started_search',
-    )
-    def decline_match(self):
-        pass
-
-    @transition(field=state, source='accepted_match', target='finished')
-    def set_finished(self):
-        pass
 
     def hero_pairs(self, other):
         self_heroes = self.user.selected_heroes.active().as_dict()
@@ -260,8 +307,39 @@ class PlayerSearch(models.Model):
     def can_match_with(self, other):
         if not self.hero_pairs(other):
             return False
-
         return True
+
+    @transition(state, SEARCHING, FOUND_MATCH)
+    def suggest_match(self, match):
+        self.match = match
+
+    @transition(state, FOUND_MATCH, ACCEPTED_MATCH)
+    def accept_match(self):
+        pass
+
+    @transition(state, ACCEPTED_MATCH, LOBBY_SETUP)
+    def to_lobby_setup(self):
+        pass
+
+    @transition(state, LOBBY_SETUP, IN_LOBBY)
+    def join_lobby(self):
+        pass
+
+    @transition(state, IN_LOBBY, SUCCESS)
+    def finalize(self):
+        self.ended_at = now()
+
+    @transition(state, (SEARCHING, FOUND_MATCH, LOBBY_SETUP, IN_LOBBY), CANCELLED)
+    def cancel(self):
+        self.ended_at = now()
+
+    @transition(state, (FOUND_MATCH, ACCEPTED_MATCH, LOBBY_SETUP, IN_LOBBY), SEARCHING)
+    def back_to_search(self):
+        pass
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.push_to_websocket()
 
 
 class BotAccountManager(models.Manager):
