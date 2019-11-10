@@ -201,7 +201,11 @@ export default class MatchFinder extends React.Component {
       <Dialog open={true}>
         <DialogTitle>Bot dispatched to create lobby</DialogTitle>
         <DialogContent>
-          <LinearProgress />
+          <img
+            src="/static/frontend/bot_running.gif"
+            alt="Bot running"
+            width="280px"
+          />
         </DialogContent>
       </Dialog>
     );
