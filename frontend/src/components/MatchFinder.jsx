@@ -7,6 +7,7 @@ import {
   Typography, Dialog, DialogActions, DialogContent, Grid, DialogTitle, Table,
   TableBody, TableRow, TableCell, LinearProgress,
 } from '@material-ui/core';
+import Notification from 'react-web-notification/lib/components/Notification';
 
 import MyButton from './MyButton.jsx';
 
@@ -153,31 +154,48 @@ export default class MatchFinder extends React.Component {
   }
 
   renderFoundMatchDialog() {
+    const source = '/static/frontend/match_found.mp3';
+    const options = {
+      body: 'Opponent: ' + this.state.opponent.personaName,
+      audio: source,
+    };
+
     return (
-      <Dialog open={true}>
-        <DialogTitle>Found match</DialogTitle>
-        <DialogContent>
-          {this.renderOpponentDetails()}
-        </DialogContent>
-        <DialogActions>
-          <MyButton
-            onClick={this.sendCommand('accept_match')}
-            variant="contained"
-            color="primary"
-            loading={this.state.waitingForResponse}
-          >
-            Accept
-          </MyButton>
-          <MyButton
-            onClick={this.sendCommand('cancel')}
-            variant="contained"
-            color="secondary"
-            loading={this.state.waitingForResponse}
-          >
-            Decline
-          </MyButton>
-        </DialogActions>
-      </Dialog>
+      <>
+        <Dialog open={true}>
+          <DialogTitle>Found match</DialogTitle>
+          <DialogContent>
+            {this.renderOpponentDetails()}
+          </DialogContent>
+          <DialogActions>
+            <MyButton
+              onClick={this.sendCommand('accept_match')}
+              variant="contained"
+              color="primary"
+              loading={this.state.waitingForResponse}
+            >
+              Accept
+            </MyButton>
+            <MyButton
+              onClick={this.sendCommand('cancel')}
+              variant="contained"
+              color="secondary"
+              loading={this.state.waitingForResponse}
+            >
+              Decline
+            </MyButton>
+          </DialogActions>
+        </Dialog>
+        <Notification
+          title="Match found"
+          options={options}
+          onShow={() => { document.getElementById('sound').play() }}
+        />
+        <audio id="sound" preload="auto" loop>
+          <source src={source} type="audio/mpeg"/>
+          <embed hidden={true} autostart={false} loop={true} src={source}/>
+        </audio>
+      </>
     );
   }
 
