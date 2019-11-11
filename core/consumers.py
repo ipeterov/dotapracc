@@ -1,10 +1,12 @@
+from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 
 from .models import PlayerSearch
+from .stats import get_stats_as_string
 
 
 class MatchFinderConsumer(WebsocketConsumer):
-    def websocket_send(self, event):
+    def websocket_find_match(self, event):
         """Needed for PlayerSearch.push_to_websocket"""
         self.send(event['message'])
 
@@ -52,3 +54,23 @@ class MatchFinderConsumer(WebsocketConsumer):
             PlayerSearch.objects.cancel(current_search)
 
 
+class StatsConsumer(WebsocketConsumer):
+    def websocket_stats(self, event):
+        self.send(event['message'])
+
+    def connect(self):
+        self.accept()
+
+        stats = get_stats_as_string()
+        self.send(stats)
+
+        async_to_sync(self.channel_layer.group_add)(
+            'stats',
+            self.channel_name,
+        )
+
+    def disconnect(self, code):
+        async_to_sync(self.channel_layer.group_discard)(
+            'stats',
+            self.channel_name,
+        )

@@ -18,7 +18,7 @@ const LOBBY_SETUP = 'lobby_setup';
 const IN_LOBBY = 'in_lobby';
 
 const prefix = process.env.NODE_ENV === 'development' ? 'ws' : 'wss';
-const wsUrl = `${prefix}://${window.location.host}/ws/find_match`
+const wsUrl = `${prefix}://${window.location.host}/ws/find_match`;
 
 
 export default class MatchFinder extends React.Component {
@@ -53,10 +53,6 @@ export default class MatchFinder extends React.Component {
         this.connect();
       }, 1000);
     };
-
-    // this.sock.onerror = () => {
-    //   this.sock.close();
-    // };
   }
 
   sendCommand(command) {

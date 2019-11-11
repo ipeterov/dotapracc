@@ -1,4 +1,6 @@
+from asgiref.sync import async_to_sync
 from celery import shared_task
+from channels.layers import get_channel_layer
 
 from core.dota_bot import invite, busy
 
@@ -33,3 +35,14 @@ def sync_heroes():
 
     syncer = HeroSyncer()
     syncer.sync_heroes()
+
+
+@shared_task
+def push_stats():
+    from core.stats import get_stats_as_string
+
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        'stats',
+        {'type': 'websocket.stats', 'message': get_stats_as_string()},
+    )

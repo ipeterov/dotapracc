@@ -287,7 +287,7 @@ class PlayerSearch(models.Model):
         async_to_sync(channel_layer.send)(
             self.channel_name,
             {
-                'type': 'websocket.send',
+                'type': 'websocket.find.match',
                 'message': json.dumps(self.as_dict()),
             },
         )
