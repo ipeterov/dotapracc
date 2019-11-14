@@ -16,6 +16,7 @@ const SEARCHING = 'searching';
 const FOUND_MATCH = 'found_match';
 const ACCEPTED_MATCH = 'accepted_match';
 const LOBBY_SETUP = 'lobby_setup';
+const LOBBY_READY = 'lobby_ready';
 const IN_LOBBY = 'in_lobby';
 
 const prefix = process.env.NODE_ENV === 'development' ? 'ws' : 'wss';
@@ -193,7 +194,7 @@ export default class MatchFinder extends React.Component {
         />
         <audio id="sound" preload="auto" loop>
           <source src={source} type="audio/mpeg"/>
-          <embed hidden={true} autostart={false} loop={true} src={source}/>
+          <embed hidden="true" autostart="false" loop="true" src={source}/>
         </audio>
       </>
     );
@@ -220,6 +221,17 @@ export default class MatchFinder extends React.Component {
             alt="Bot running"
             width="280px"
           />
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  renderLobbyReadyDialog() {
+    return (
+      <Dialog open={true}>
+        <DialogTitle>Lobby created, waiting for players to join</DialogTitle>
+        <DialogContent>
+          <LinearProgress />
         </DialogContent>
       </Dialog>
     );
@@ -264,6 +276,13 @@ export default class MatchFinder extends React.Component {
         <>
           <Typography>Setting up lobby</Typography>
           {this.renderWaitingForLobbyDialog()}
+        </>
+      );
+    } else if (state === LOBBY_READY) {
+      return (
+        <>
+          <Typography>Lobby created, waiting for players to join</Typography>
+          {this.renderLobbyReadyDialog()}
         </>
       );
     } else if (state === IN_LOBBY) {

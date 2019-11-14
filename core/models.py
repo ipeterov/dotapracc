@@ -180,6 +180,13 @@ class PlayerSearchManager(models.Manager):
             search.match.save()
         search.save()
 
+    @staticmethod
+    def lobby_ready(search):
+        search.to_lobby_ready()
+        search.save()
+        search.match.to_lobby_ready()
+        search.match.save()
+
     def join_lobby(self, search):
         search.join_lobby()
         if search.match.state == self.model.IN_LOBBY:
@@ -208,6 +215,7 @@ class PlayerSearch(models.Model):
     FOUND_MATCH = 'found_match'
     ACCEPTED_MATCH = 'accepted_match'
     LOBBY_SETUP = 'lobby_setup'
+    LOBBY_READY = 'lobby_ready'
     IN_LOBBY = 'in_lobby'
     SUCCESS = 'success'
 
@@ -217,6 +225,7 @@ class PlayerSearch(models.Model):
         (FOUND_MATCH, 'Found a match'),
         (ACCEPTED_MATCH, 'Accepted the match'),
         (LOBBY_SETUP, 'Setting up a lobby'),
+        (LOBBY_READY, 'Lobby ready'),
         (IN_LOBBY, 'In lobby'),
         (SUCCESS, 'Successfully matched'),
     )
@@ -226,6 +235,7 @@ class PlayerSearch(models.Model):
         FOUND_MATCH,
         ACCEPTED_MATCH,
         LOBBY_SETUP,
+        LOBBY_READY,
         IN_LOBBY,
     ]
 
@@ -255,6 +265,7 @@ class PlayerSearch(models.Model):
                         'found_match',
                         'accepted_match',
                         'lobby_setup',
+                        'lobby_ready',
                         'in_lobby',
                     ]
                 ),
@@ -321,7 +332,11 @@ class PlayerSearch(models.Model):
     def to_lobby_setup(self):
         pass
 
-    @transition(state, LOBBY_SETUP, IN_LOBBY)
+    @transition(state, LOBBY_SETUP, LOBBY_READY)
+    def to_lobby_ready(self):
+        pass
+
+    @transition(state, LOBBY_READY, IN_LOBBY)
     def join_lobby(self):
         pass
 
@@ -359,3 +374,6 @@ class BotAccount(models.Model):
     is_busy = models.BooleanField()
 
     objects = BotAccountManager()
+
+    def __str__(self):
+        return self.login

@@ -22,11 +22,14 @@ def invite_players(steam_ids, lobby_name):
         for info, steam_id in invite(steam_ids, bot_account, lobby_name):
             user = SteamUser.objects.get(steamid=steam_id)
             search = PlayerSearch.objects.current_search(user)
+
             if info == 'leaver':
                 PlayerSearch.objects.cancel(search)
                 break
             elif info == 'in_lobby':
                 PlayerSearch.objects.join_lobby(search)
+            elif info == 'lobby_created':
+                PlayerSearch.objects.lobby_ready(search)
 
 
 @shared_task

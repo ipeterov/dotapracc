@@ -1,3 +1,4 @@
+import random
 from contextlib import contextmanager
 from secrets import token_hex
 
@@ -39,7 +40,7 @@ def invite(steam_ids, bot_account, lobby_name):
     client = SteamClient()
     dota = Dota2Client(client)
 
-    steam_ids = {int(steamid) for steamid in steam_ids}
+    steam_ids = [int(steamid) for steamid in steam_ids]
     yielded = set()
 
     @client.on('connected')
@@ -61,6 +62,7 @@ def invite(steam_ids, bot_account, lobby_name):
 
     @dota.once('lobby_new')
     def setup_and_invite_all(lobby):
+        client.emit('info', 'lobby_created', random.choice(steam_ids))
         for steam_id in steam_ids:
             dota.invite_to_lobby(steam_id)
 
@@ -74,7 +76,7 @@ def invite(steam_ids, bot_account, lobby_name):
             steamid for steamid in lobby.pending_invites
             if steamid in steam_ids
         }
-        leavers = steam_ids - (in_lobby | pending)
+        leavers = set(steam_ids) - (in_lobby | pending)
 
         nonlocal yielded
         to_yield = in_lobby - yielded

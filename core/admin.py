@@ -2,6 +2,7 @@ from django.contrib import admin
 from .models import Hero, HeroMatchup, PlayerSearch, SelectedHero, BotAccount
 
 
+@admin.register(HeroMatchup)
 class HeroMatchupAdmin(admin.ModelAdmin):
     model = HeroMatchup
 
@@ -9,13 +10,42 @@ class HeroMatchupAdmin(admin.ModelAdmin):
         return super().get_queryset(*args).select_related('hero', 'other_hero')
 
 
+@admin.register(Hero)
 class HeroAdmin(admin.ModelAdmin):
     model = Hero
     list_per_page = 200
+    list_display = (
+        'name',
+        'midlane_presence',
+        'opendota_id',
+    )
 
 
-admin.site.register(Hero, HeroAdmin)
-admin.site.register(HeroMatchup, HeroMatchupAdmin)
-admin.site.register(PlayerSearch)
-admin.site.register(SelectedHero)
-admin.site.register(BotAccount)
+@admin.register(PlayerSearch)
+class PlayerSearchAdmin(admin.ModelAdmin):
+    model = PlayerSearch
+    list_display = (
+        'user',
+        'started_at',
+        'ended_at',
+        'state',
+    )
+
+
+@admin.register(BotAccount)
+class BotAccountAdmin(admin.ModelAdmin):
+    model = BotAccount
+    list_display = (
+        'login',
+        'is_busy',
+    )
+
+
+@admin.register(SelectedHero)
+class SelectedHeroAdmin(admin.ModelAdmin):
+    model = SelectedHero
+    list_display = (
+        'user',
+        'hero',
+        'is_switched_on',
+    )
