@@ -40,7 +40,6 @@ export default class MatchFinder extends React.Component {
 
     this.sock.onmessage = (message) => {
       const newState = JSON.parse(message.data);
-      console.log(message);
       newState.waitingForResponse = false;
       this.setState(newState);
     };

@@ -49,7 +49,7 @@ export default class Stats extends React.Component {
         {
           _.map(this.state.stats, (value, name) => {
             return `${name}: ${value}`;
-          }).join(', ')
+          }).join(' | ')
         }
       </Typography>
     );
@@ -60,7 +60,7 @@ export default class Stats extends React.Component {
       <Grid container direction="row" justify="space-between">
         <Grid item />
         <Grid item
-          style={ this.state.loading ? { width: '45%' } : {} }
+          style={ this.state.loading ? { width: '580px' } : {} }
         >
           { this.renderStats() }
         </Grid>

@@ -22,7 +22,7 @@ export default function Base() {
         style={{
           paddingTop: 72,
           paddingBottom: 36,
-          minHeight: 'calc(100vh - 116px)'
+          minHeight: 'calc(100vh - 116px)',
         }}
         fixed={true}
       >

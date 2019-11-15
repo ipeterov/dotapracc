@@ -1,10 +1,13 @@
 import React from 'react';
 import gql from 'graphql-tag';
 import { useQuery } from "@apollo/react-hooks";
+import { withStyles } from '@material-ui/core/styles';
 
 import {
   Grid, Menu, MenuItem, Avatar, Button, CircularProgress,
 } from '@material-ui/core';
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import { Skeleton } from "@material-ui/lab";
 
 import MatchFinder from './MatchFinder.jsx';
 
@@ -19,15 +22,30 @@ const QUERY = gql`
   }
 `;
 
-export default function AvatarSection() {
+const styles = {
+  startIcon: { marginRight: 0 },
+};
+
+
+function AvatarSection({ classes }) {
   const { loading, error, data } = useQuery(QUERY);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
 
   if (error) return <p>Error :(</p>;
   if (loading) return (
-    <Grid container justify="center">
-      <CircularProgress />
+    <Grid container
+      direction="row"
+      justify="flex-end"
+      alignItems="center"
+      spacing={1}
+    >
+      <Grid item>
+        <Skeleton variant="rect" width={200} />
+      </Grid>
+      <Grid item>
+        <Skeleton variant="circle" width={40} height={40} />
+      </Grid>
     </Grid>
   );
 
@@ -63,14 +81,18 @@ export default function AvatarSection() {
 
       <Grid item>
         <Button
+          classes={{ startIcon: classes.startIcon }}
           variant="text"
           color="inherit"
           onClick={handleMenu}
+          startIcon={
+            <ArrowDropDownIcon />
+          }
           endIcon={
             <Avatar
               alt={data.viewer.personaname}
               src={data.viewer.avatarmedium}
-             />
+            />
           }
         >
           {data.viewer.personaname}
@@ -101,3 +123,5 @@ export default function AvatarSection() {
     </Grid>
   );
 }
+
+export default withStyles(styles)(AvatarSection);

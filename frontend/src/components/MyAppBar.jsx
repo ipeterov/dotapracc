@@ -2,7 +2,7 @@ import React from 'react';
 import { Link as RouterLink } from "react-router-dom";
 
 import {
-  AppBar, Toolbar, Grid, Link,
+  AppBar, Toolbar, Grid, Link, Typography,
 } from '@material-ui/core';
 
 import AvatarSection from './AvatarSection.jsx';
@@ -24,14 +24,12 @@ export default function MyAppBar() {
               spacing={1}
             >
               <Grid item>
-                <Link
-                  variant="button"
+                <Typography
                   color="inherit"
-                  component={RouterLink}
-                  to="/"
+                  variant="button"
                 >
                   dotapra.cc
-                </Link>
+                </Typography>
               </Grid>
               <Grid item>
                 <Link
