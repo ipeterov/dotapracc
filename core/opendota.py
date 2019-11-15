@@ -24,6 +24,37 @@ def wilson_score(up, down):
     )
 
 
+PRO_MATCHUPS_QUERY = '''
+    SELECT
+        b.hero_id,
+        avg(a.gold_t[11]::decimal / b.gold_t[11])
+        
+    FROM player_matches a
+    JOIN player_matches b on a.match_id = b.match_id
+    
+    WHERE b.is_roaming = false
+    
+    AND a.lane = b.lane
+    AND a.lane = 2
+    
+    AND a.lane_role = b.lane_role
+    AND a.lane_role = 2
+    
+    AND a.account_id != b.account_id -- Not same player
+    AND (a.player_slot < 128) != (b.player_slot < 128) -- Not in same team
+    AND b.gold_t[11] = (
+        SELECT max(gold_t[11])
+        FROM player_matches 
+        WHERE match_id = a.match_id 
+        AND (player_slot < 128) = (b.player_slot < 128)
+    ) -- Ensure enemy is primary midlaner
+    
+    AND a.hero_id = {}
+    
+    GROUP BY b.hero_id
+'''
+
+
 class OpenDotaAPI:
     def __init__(self):
         self.raw_api_url = settings.OPENDOTA_API_URL
@@ -63,3 +94,11 @@ class OpenDotaAPI:
 
     def get_profile_info(self, steam32id):
         return self.get(f'players/{steam32id}')
+
+    def get_pro_matchups(self, hero_id: int):
+        query = PRO_MATCHUPS_QUERY.format(hero_id)
+
+        # Also has advantage data, not super useful (too little data)
+        # Wanted to keep it in the query just in case
+        raw = self.get('explorer', {'sql': query})
+        return [item['hero_id'] for item in raw['rows']]

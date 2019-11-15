@@ -1,13 +1,5 @@
 from django.contrib import admin
-from .models import Hero, HeroMatchup, PlayerSearch, SelectedHero, BotAccount
-
-
-@admin.register(HeroMatchup)
-class HeroMatchupAdmin(admin.ModelAdmin):
-    model = HeroMatchup
-
-    def get_queryset(self, *args):
-        return super().get_queryset(*args).select_related('hero', 'other_hero')
+from .models import Hero, PlayerSearch, SelectedHero, BotAccount
 
 
 @admin.register(Hero)
@@ -30,6 +22,7 @@ class PlayerSearchAdmin(admin.ModelAdmin):
         'ended_at',
         'state',
     )
+    radio_fields = {'state': admin.HORIZONTAL}
 
 
 @admin.register(BotAccount)
@@ -49,3 +42,4 @@ class SelectedHeroAdmin(admin.ModelAdmin):
         'hero',
         'is_switched_on',
     )
+    filter_horizontal = ['matchups']

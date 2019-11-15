@@ -16,10 +16,14 @@ from .tasks import invite_players
 
 
 class HeroQuerySet(models.QuerySet):
-    def lane_occupants(self, lane):
+    def lane_occupants(self, lane, cutoff=None):
         assert lane in Hero.FIELD_MAP
+
+        if cutoff is None:
+            cutoff = settings.LANE_PRESENCE_CUTOFF
+
         condition = {
-            Hero.FIELD_MAP[lane] + '__gte': settings.LANE_PRESENCE_CUTOFF
+            Hero.FIELD_MAP[lane] + '__gte': cutoff
         }
         return self.filter(**condition)
 
@@ -33,11 +37,8 @@ class Hero(models.Model):
     }
 
     name = models.CharField(max_length=64)
-
-    opendota_id = models.IntegerField(unique=True)
     picture = models.ImageField(upload_to='hero_images')
-
-    aliases = models.TextField(null=True, blank=True)
+    opendota_id = models.IntegerField(unique=True)
 
     primary_attribute = models.CharField(max_length=9, choices=(
         ('Strength', 'Strength'),
@@ -54,46 +55,17 @@ class Hero(models.Model):
     offlane_presence = models.FloatField(default=0)
     jungle_presence = models.FloatField(default=0)
 
-    counters = models.ManyToManyField('self', blank=True, related_name='+')
-    easy_lanes = models.ManyToManyField('self', blank=True, related_name='+')
+    pro_matchups = models.ManyToManyField(
+        'self',
+        blank=True,
+        related_name='+',
+        symmetrical=False,
+    )
 
     objects = HeroQuerySet.as_manager()
 
     def __str__(self):
         return self.name
-
-    def update_matchups(self):
-        midlaners = Hero.objects.lane_occupants('mid')
-        matchup_qs = (
-            self.matchups
-                .select_related('other_hero')
-                .filter(other_hero__in=midlaners)
-        )
-
-        counters = matchup_qs.order_by('advantage')[:settings.TOP_N_MATCHUPS]
-        self.counters.set(matchup.other_hero for matchup in counters)
-
-        easy_lanes = matchup_qs.order_by('-advantage')[:settings.TOP_N_MATCHUPS]
-        self.easy_lanes.set(matchup.other_hero for matchup in easy_lanes)
-
-
-class HeroMatchup(models.Model):
-    hero = models.ForeignKey(
-        Hero,
-        on_delete=models.CASCADE,
-        related_name='matchups',
-    )
-    other_hero = models.ForeignKey(
-        Hero,
-        on_delete=models.CASCADE,
-        related_name='+',
-    )
-
-    advantage = models.FloatField()
-
-    def __str__(self):
-        hero, advantage, other_hero = self.hero, self.advantage, self.other_hero
-        return f'{hero} has {advantage} advantage over {other_hero}'
 
 
 class SelectedHeroQuerySet(models.QuerySet):

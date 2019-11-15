@@ -24,8 +24,7 @@ export const SELECTED_HERO_FRAGMENT = gql`
       picture
       primaryAttribute
       attackType
-      counters { __typename id }
-      easyLanes { __typename id }
+      proMatchups { __typename id }
     }
   }
 `;
@@ -137,8 +136,7 @@ class SelectedHero extends React.Component {
 
     const matchups = this.getIdArray(selectedHero.matchups);
     const midlaners = this.getIdArray(this.props.midlaners);
-    const counters = this.getIdArray(selectedHero.hero.counters);
-    const easyLanes = this.getIdArray(selectedHero.hero.easyLanes);
+    const proMatchups = this.getIdArray(selectedHero.hero.proMatchups);
 
     const heroesByAttr = this.getHeroesByAttr(allHeroes);
 
@@ -232,11 +230,8 @@ class SelectedHero extends React.Component {
                   <Button onClick={this.toggleHeroes(midlaners)}>
                     Toggle all mids
                   </Button>
-                  <Button onClick={this.toggleHeroes(counters)}>
-                    Toggle counters
-                  </Button>
-                  <Button onClick={this.toggleHeroes(easyLanes)}>
-                    Toggle easy lanes
+                  <Button onClick={this.toggleHeroes(proMatchups)}>
+                    Toggle pro matchups
                   </Button>
                 </ButtonGroup>
                 <ButtonGroup variant="text" size="medium">
