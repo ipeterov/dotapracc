@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Typography } from '@material-ui/core';
+import { Typography, Grid } from '@material-ui/core';
 
 import SelectedHeroes from './SelectedHeroes.jsx';
 import ProfileVariables from './ProfileVariables.jsx';
@@ -8,22 +8,20 @@ import ProfileVariables from './ProfileVariables.jsx';
 
 export default function Profile() {
   return (
-    <>
-      <Typography
-        variant="h5"
-        style={{ marginBottom: '8px', marginTop: '16px' }}
-      >
-        Profile
-      </Typography>
-      <ProfileVariables />
+    <Grid container spacing={2} direction="column">
+      <Grid item>
+        <Typography variant="h5" style={{ marginBottom: 8 }}>
+          Profile
+        </Typography>
+        <ProfileVariables />
+      </Grid>
 
-      <Typography
-        variant="h5"
-        style={{ marginBottom: '8px', marginTop: '16px' }}
-      >
-        Selected heroes
-      </Typography>
-      <SelectedHeroes />
-    </>
+      <Grid item>
+        <Typography variant="h5" style={{ marginBottom: 8 }}>
+          Selected heroes
+        </Typography>
+        <SelectedHeroes />
+      </Grid>
+    </Grid>
   );
 }

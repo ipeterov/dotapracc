@@ -7,7 +7,7 @@ import {
 import AddIcon from '@material-ui/icons/Add';
 
 
-export default function AddHeroDialog({ allHeroes, handleAdd }) {
+export default function AddHeroDialog({ allHeroes, handleAdd, disabled }) {
   const [open, setOpen] = React.useState(false);
   const [heroId, setHeroId] = React.useState('');
 
@@ -21,46 +21,54 @@ export default function AddHeroDialog({ allHeroes, handleAdd }) {
 
   return (
     <div>
-      <Button variant="contained" color="primary" onClick={handleClickOpen}>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleClickOpen}
+        disabled={disabled}
+      >
         <AddIcon />
         Add hero to train
       </Button>
-      <Dialog open={open} onClose={handleClose}>
-        <DialogContent>
-          <DialogContentText>
-            Add a hero to your matching profile. You will only get matches
-            with people who want to play against your heroes.
-          </DialogContentText>
-          <FormControl>
-            <InputLabel>Hero</InputLabel>
-            <Select
-              autoFocus
-              style={{ width: '200px' }}
-              value={heroId}
-              onChange={({target}) => {setHeroId(target.value)}}
+      { !disabled && (
+        <Dialog open={open} onClose={handleClose}>
+          <DialogContent>
+            <DialogContentText>
+              Add a hero to your matching profile. You will only get matches
+              with people who want to play against your heroes.
+            </DialogContentText>
+            <FormControl>
+              <InputLabel>Hero</InputLabel>
+              <Select
+                autoFocus
+                style={{ width: '200px' }}
+                value={heroId}
+                onChange={({target}) => {setHeroId(target.value)}}
+              >
+                {allHeroes.map(hero => (
+                  <MenuItem key={hero.id} value={hero.id}>{hero.name}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose} color="primary">
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {handleClose(); handleAdd(heroId)}}
+              color="primary"
             >
-              {allHeroes.map(hero => (
-                <MenuItem key={hero.id} value={hero.id}>{hero.name}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="primary">
-            Cancel
-          </Button>
-          <Button
-            onClick={() => {handleClose(); handleAdd(heroId)}}
-            color="primary"
-          >
-            Add hero
-          </Button>
-        </DialogActions>
-      </Dialog>
+              Add hero
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
     </div>
   );
 }
 
 AddHeroDialog.propTypes = {
   handleAdd: PropTypes.func.isRequired,
+  disabled: PropTypes.bool.isRequired,
 };

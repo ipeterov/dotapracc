@@ -6,7 +6,10 @@ import { graphql } from '@apollo/react-hoc';
 import { compose } from 'recompose';
 import gql from 'graphql-tag';
 
-import { Grid, CircularProgress, Typography, Button } from "@material-ui/core";
+import {
+  Grid, CircularProgress, Typography, Button,
+} from "@material-ui/core";
+import { Skeleton } from "@material-ui/lab";
 
 import SelectedHero, {
   SELECTED_HERO_FRAGMENT, UPDATE_OR_CREATE_SELECTED_HERO,
@@ -103,45 +106,9 @@ class SelectedHeroes extends React.Component {
     });
   }
 
-  render() {
-    const { data } = this.props;
-    const { loading, error } = data;
-
-    if (error) return <p>Error :(</p>;
-    if (loading) return (
-      <Grid container justify="center">
-        <CircularProgress />
-      </Grid>
-    );
-
-    if (data.viewer == null) return (
-      <Typography>
-        Log in to be able to train heroes.
-      </Typography>
-    );
-
+  renderSelectedHeroes(data) {
     return (
-      <Grid container spacing={2}>
-        <Grid item>
-          <Grid container spacing={2}>
-            <Grid item>
-              <AddHeroDialog
-                handleAdd={this.handleAdd}
-                allHeroes={data.allHeroes}
-              />
-            </Grid>
-            <Grid item>
-              <Button onClick={() => this.handleToggleSelectedHeroes(true)}>
-                Switch all heroes on
-              </Button>
-            </Grid>
-            <Grid item>
-              <Button onClick={() => this.handleToggleSelectedHeroes(false)}>
-                Switch all heroes off
-              </Button>
-            </Grid>
-          </Grid>
-        </Grid>
+      <>
         {
           data.viewer.selectedHeroes.length === 0 && (
             <Grid item xs={12}>
@@ -174,6 +141,64 @@ class SelectedHeroes extends React.Component {
             />
           ))
         }
+      </>
+    );
+  }
+
+  renderSkeletons() {
+    return _.times(1, (i) => (
+      <Grid key={i} item style={{ width: '100%' }}>
+        <Skeleton variant="rect" height={188.5} />
+      </Grid>
+    ));
+  }
+
+  render() {
+    const { data } = this.props;
+    const { loading, error } = data;
+
+    if (error) return <p>Error :(</p>;
+
+    if (!loading && data.viewer == null) return (
+      <Typography>
+        Log in to be able to train heroes.
+      </Typography>
+    );
+
+    return (
+      <Grid container spacing={2} direction="column">
+        <Grid item>
+          <Grid container spacing={2}>
+            <Grid item>
+              <AddHeroDialog
+                disabled={loading}
+                handleAdd={this.handleAdd}
+                allHeroes={data.allHeroes}
+              />
+            </Grid>
+            <Grid item>
+              <Button
+                onClick={() => this.handleToggleSelectedHeroes(true)}
+                disabled={loading}
+              >
+                Switch all heroes on
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                onClick={() => this.handleToggleSelectedHeroes(false)}
+                disabled={loading}
+              >
+                Switch all heroes off
+              </Button>
+            </Grid>
+          </Grid>
+        </Grid>
+        <Grid item>
+          <Grid container spacing={2}>
+            { loading ? this.renderSkeletons() : this.renderSelectedHeroes(data)}
+          </Grid>
+        </Grid>
       </Grid>
     );
   }

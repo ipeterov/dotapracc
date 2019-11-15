@@ -3,7 +3,7 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-} from "react-router-dom";
+} from 'react-router-dom';
 
 import { Container } from '@material-ui/core';
 
@@ -11,13 +11,21 @@ import About from './About.jsx';
 import Profile from './Profile.jsx';
 import MyAppBar from './MyAppBar.jsx';
 import Stats from './Stats.jsx';
+import Footer from './Footer.jsx';
 
 
 export default function Base() {
   return (
     <Router>
       <MyAppBar />
-      <Container style={{ marginTop: 80 }} fixed={true} >
+      <Container
+        style={{
+          paddingTop: 72,
+          paddingBottom: 36,
+          minHeight: 'calc(100vh - 116px)'
+        }}
+        fixed={true}
+      >
         <Stats />
         <Switch>
           <Route path="/about/">
@@ -27,7 +35,8 @@ export default function Base() {
             <Profile />
           </Route>
         </Switch>
-       </Container>
+      </Container>
+      <Footer />
     </Router>
   );
 }

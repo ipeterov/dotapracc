@@ -2,8 +2,9 @@ import _ from 'lodash';
 import React from 'react';
 import autoBind from 'react-autobind';
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
-import { Typography } from "@material-ui/core";
 
+import { Typography, Grid } from "@material-ui/core";
+import { Skeleton } from "@material-ui/lab";
 
 const prefix = process.env.NODE_ENV === 'development' ? 'ws' : 'wss';
 const wsUrl = `${prefix}://${window.location.host}/ws/stats`;
@@ -15,7 +16,7 @@ export default class Stats extends React.Component {
     autoBind(this);
 
     this.state = {
-      connected: false,
+      loading: true,
       stats: {},
     };
 
@@ -27,22 +28,22 @@ export default class Stats extends React.Component {
 
     this.sock.onmessage = (message) => {
       const stats = JSON.parse(message.data);
-      this.setState({ stats });
-    };
-
-    this.sock.onopen = () => {
-      this.setState({connected: true});
+      this.setState({ stats, loading: false });
     };
 
     this.sock.onclose = () => {
-      this.setState({connected: false});
+      this.setState({ loading: true });
       setTimeout(() => {
         this.connect();
       }, 1000);
     };
   }
 
-  render() {
+  renderStats() {
+    if (this.state.loading) return (
+      <Skeleton variant="rect" height={24} />
+    );
+
     return (
       <Typography color="textSecondary">
         {
@@ -51,6 +52,19 @@ export default class Stats extends React.Component {
           }).join(', ')
         }
       </Typography>
+    );
+  }
+
+  render() {
+    return (
+      <Grid container direction="row" justify="space-between">
+        <Grid item />
+        <Grid item
+          style={ this.state.loading ? { width: '45%' } : {} }
+        >
+          { this.renderStats() }
+        </Grid>
+      </Grid>
     );
   }
 }

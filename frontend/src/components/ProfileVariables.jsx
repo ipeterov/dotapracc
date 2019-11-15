@@ -5,9 +5,8 @@ import { graphql } from '@apollo/react-hoc';
 import { compose } from 'recompose';
 import gql from 'graphql-tag';
 
-import {
-  Typography, Grid, CircularProgress, TextField,
-} from '@material-ui/core';
+import { Typography, TextField } from '@material-ui/core';
+import { Skeleton } from "@material-ui/lab";
 
 
 const PROFILE_FRAGMENT = gql`
@@ -63,16 +62,15 @@ class ProfileVariables extends React.Component {
     const { loading, error } = data;
 
     if (error) return <p>Error :(</p>;
-    if (loading) return (
-      <Grid container justify="center">
-        <CircularProgress />
-      </Grid>
-    );
 
-    if (data.viewer == null) return (
+    if (!loading && data.viewer == null) return (
       <Typography>
         Log in to be able to configure your profile.
       </Typography>
+    );
+
+    if (loading) return (
+      <Skeleton variant="rect" height={48} />
     );
 
     return (

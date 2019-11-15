@@ -105,6 +105,7 @@ export default class MatchFinder extends React.Component {
         variant="contained"
         color="secondary"
         loading={this.state.waitingForResponse}
+        disabled={!this.state.connected}
       >
         Find match
       </MyButton>
@@ -250,10 +251,6 @@ export default class MatchFinder extends React.Component {
 
   render() {
     const state = this.state.state;
-
-    if (!this.state.connected) {
-      return <Typography>Connecting to dotapra.cc coordinator</Typography>;
-    }
 
     if (state === SEARCHING) {
       return this.renderCancelButton();
