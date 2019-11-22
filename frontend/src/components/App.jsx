@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { ApolloProvider } from '@apollo/react-hooks';
-import { SnackbarProvider } from 'notistack';
+import {ApolloProvider} from '@apollo/react-hooks';
+import {SnackbarProvider} from 'notistack';
 import ApolloClient from 'apollo-boost';
 import WebfontLoader from '@dr-kobros/react-webfont-loader';
 
-import Base from './Base.jsx'
+import Base from './Base.jsx';
 
 
 const client = new ApolloClient(
@@ -28,8 +28,8 @@ class App extends React.Component {
           </ApolloProvider>
         </SnackbarProvider>
       </WebfontLoader>
-    )
+    );
   }
 }
 
-ReactDOM.render(<App />, document.getElementById("app"));
+ReactDOM.render(<App />, document.getElementById('app'));

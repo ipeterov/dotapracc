@@ -1,9 +1,5 @@
-import React from 'react';
-import { Link as RouterLink } from "react-router-dom";
-
-import {
-  AppBar, Toolbar, Grid, Link, Typography,
-} from '@material-ui/core';
+import {Link as RouterLink} from 'react-router-dom';
+import {AppBar, Grid, Link, Toolbar, Typography,} from '@material-ui/core';
 
 import AvatarSection from './AvatarSection.jsx';
 

@@ -1,13 +1,23 @@
 import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
+import {graphql} from '@apollo/react-hoc';
 import gql from 'graphql-tag';
-
 import {
-  Card, CardContent, Grid, GridList, GridListTile, CardHeader, Avatar,
-  IconButton, Typography, CircularProgress, Button, ButtonGroup, Switch,
-} from "@material-ui/core";
+  Avatar,
+  Button,
+  ButtonGroup,
+  Card,
+  CardContent,
+  CardHeader,
+  CircularProgress,
+  Grid,
+  GridList,
+  GridListTile,
+  IconButton,
+  Switch,
+  Typography,
+} from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 
 
@@ -71,7 +81,7 @@ class SelectedHero extends React.Component {
       heroesByAttr[hero.primaryAttribute].push(hero);
     });
     ['STRENGTH', 'AGILITY', 'INTELLECT'].forEach(attr => {
-      heroesByAttr[attr] = _.sortBy(heroesByAttr[attr], ['name'])
+      heroesByAttr[attr] = _.sortBy(heroesByAttr[attr], ['name']);
     });
     return heroesByAttr;
   }
@@ -84,7 +94,7 @@ class SelectedHero extends React.Component {
     } else {
       greyscalePercent = highlighted ? 75: 100;
     }
-    return { filter: `grayscale(${greyscalePercent}%)` }
+    return { filter: `grayscale(${greyscalePercent}%)` };
   }
 
   update(updates) {
@@ -146,6 +156,7 @@ class SelectedHero extends React.Component {
           <CardHeader
             avatar={
               <Avatar
+                /* eslint-disable-next-line no-undef */
                 src={MEDIA_PREFIX + selectedHero.hero.picture}
                 style={{
                   width: '80px',
@@ -201,39 +212,41 @@ class SelectedHero extends React.Component {
             </Grid>
             { this.state.matchupsExpanded &&
               ['STRENGTH', 'AGILITY', 'INTELLECT'].map(attribute => (
-              <GridList
-                key={attribute}
-                spacing={1}
-                cols={15}
-                cellHeight={44}
-                style={{ marginBottom: '8px' }}
-              >
-                {heroesByAttr[attribute].map(hero => (
-                  <GridListTile
-                    key={hero.picture}
-                    onMouseDown={this.toggleHeroes([hero.id])}
-                    onMouseEnter={() => this.setState({ highlightedHeroId: hero.id })}
-                    onMouseLeave={() => this.setState({ highlightedHeroId: null })}
-                  >
-                    <img
-                      src={MEDIA_PREFIX + hero.picture}
-                      alt={hero.name}
-                      style={this.getGreyscaleStyle(hero.id, matchups)}
-                    />
-                  </GridListTile>
-                ))}
-              </GridList>
-            ))}
+                <GridList
+                  key={attribute}
+                  spacing={1}
+                  cols={15}
+                  cellHeight={44}
+                  style={{ marginBottom: '8px' }}
+                >
+                  {heroesByAttr[attribute].map(hero => (
+                    <GridListTile
+                      key={hero.picture}
+                      onMouseDown={this.toggleHeroes([hero.id])}
+                      onMouseEnter={() => this.setState({ highlightedHeroId: hero.id })}
+                      onMouseLeave={() => this.setState({ highlightedHeroId: null })}
+                    >
+                      <img
+                        /* eslint-disable-next-line no-undef */
+                        src={MEDIA_PREFIX + hero.picture}
+                        alt={hero.name}
+                        style={this.getGreyscaleStyle(hero.id, matchups)}
+                      />
+                    </GridListTile>
+                  ))}
+                </GridList>
+              ))
+            }
             {this.state.matchupsExpanded &&
               <Grid container justify="center">
                 <ButtonGroup variant="text" size="medium">
                   <Button onClick={() => {
-                    this.update({ heroIds: midlaners })
+                    this.update({ heroIds: midlaners });
                   }}>
                     Select all mids
                   </Button>
                   <Button onClick={() => {
-                    this.update({ heroIds: proMatchups })
+                    this.update({ heroIds: proMatchups });
                   }}>
                     Select pro matchups
                   </Button>
@@ -267,4 +280,4 @@ SelectedHero.propTypes = {
   justAdded: PropTypes.bool.isRequired,
 };
 
-export default graphql(UPDATE_OR_CREATE_SELECTED_HERO)(SelectedHero)
+export default graphql(UPDATE_OR_CREATE_SELECTED_HERO)(SelectedHero);

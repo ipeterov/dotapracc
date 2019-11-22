@@ -1,5 +1,4 @@
-import React from 'react';
-import { Button, CircularProgress } from '@material-ui/core';
+import {Button, CircularProgress} from '@material-ui/core';
 
 
 const MyButton = (props) => {
@@ -31,7 +30,7 @@ const MyButton = (props) => {
         />
       }
     </Button>
-  )
+  );
 };
 
 export default MyButton;

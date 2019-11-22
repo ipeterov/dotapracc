@@ -1,13 +1,11 @@
 import React from 'react';
 import gql from 'graphql-tag';
-import { useQuery } from "@apollo/react-hooks";
-import { withStyles } from '@material-ui/core/styles';
+import {useQuery} from '@apollo/react-hooks';
+import {withStyles} from '@material-ui/core/styles';
 
-import {
-  Grid, Menu, MenuItem, Avatar, Button, CircularProgress,
-} from '@material-ui/core';
+import {Avatar, Button, Grid, Menu, MenuItem,} from '@material-ui/core';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
-import { Skeleton } from "@material-ui/lab";
+import {Skeleton} from '@material-ui/lab';
 
 import MatchFinder from './MatchFinder.jsx';
 
@@ -62,6 +60,7 @@ function AvatarSection({ classes }) {
       <img
         alt="Sign in with Steam"
         src="/static/frontend/steam.png"
+        /* eslint-disable-next-line no-undef */
         onClick={() => { window.location.href = LOGIN_URL; }}
         style={{ cursor: 'pointer' }}
       />
@@ -114,6 +113,7 @@ function AvatarSection({ classes }) {
           onClose={handleClose}
         >
           <MenuItem
+            /* eslint-disable-next-line no-undef */
             onClick={() => { window.location.href = LOGOUT_URL; }}
           >
             Log out

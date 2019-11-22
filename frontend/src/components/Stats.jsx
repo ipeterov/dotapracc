@@ -1,11 +1,11 @@
 import _ from 'lodash';
 import React from 'react';
 import autoBind from 'react-autobind';
-import { w3cwebsocket as W3CWebSocket } from 'websocket';
+import {w3cwebsocket as W3CWebSocket} from 'websocket';
+import {Grid, Typography} from '@material-ui/core';
+import {Skeleton} from '@material-ui/lab';
 
-import { Typography, Grid } from "@material-ui/core";
-import { Skeleton } from "@material-ui/lab";
-
+// eslint-disable-next-line no-undef
 const prefix = process.env.NODE_ENV === 'development' ? 'ws' : 'wss';
 const wsUrl = `${prefix}://${window.location.host}/ws/stats`;
 

@@ -2,18 +2,16 @@ import _ from 'lodash';
 import React from 'react';
 import autoBind from 'react-autobind';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import { compose } from 'recompose';
+import {graphql} from '@apollo/react-hoc';
+import {compose} from 'recompose';
 import gql from 'graphql-tag';
-
-import {
-  Grid, CircularProgress, Typography, Button,
-} from "@material-ui/core";
-import { Skeleton } from "@material-ui/lab";
+import {Button, CircularProgress, Grid, Typography,} from '@material-ui/core';
+import {Skeleton} from '@material-ui/lab';
 
 import SelectedHero, {
-  SELECTED_HERO_FRAGMENT, UPDATE_OR_CREATE_SELECTED_HERO,
-} from "./SelectedHero.jsx";
+  SELECTED_HERO_FRAGMENT,
+  UPDATE_OR_CREATE_SELECTED_HERO,
+} from './SelectedHero.jsx';
 import AddHeroDialog from './AddHeroDialog.jsx';
 
 

@@ -1,12 +1,11 @@
 import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/react-hoc';
-import { compose } from 'recompose';
+import {graphql} from '@apollo/react-hoc';
+import {compose} from 'recompose';
 import gql from 'graphql-tag';
-
-import { Typography, TextField } from '@material-ui/core';
-import { Skeleton } from "@material-ui/lab";
+import {TextField, Typography} from '@material-ui/core';
+import {Skeleton} from '@material-ui/lab';
 
 
 const PROFILE_FRAGMENT = gql`

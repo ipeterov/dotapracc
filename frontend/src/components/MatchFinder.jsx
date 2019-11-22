@@ -1,11 +1,19 @@
 import React from 'react';
 import ReactTimeAgo from 'react-time-ago';
 import autoBind from 'react-autobind';
-import { w3cwebsocket as W3CWebSocket } from 'websocket';
-
+import {w3cwebsocket as W3CWebSocket} from 'websocket';
 import {
-  Typography, Dialog, DialogActions, DialogContent, Grid, DialogTitle, Table,
-  TableBody, TableRow, TableCell, LinearProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  LinearProgress,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+  Typography,
 } from '@material-ui/core';
 import Notification from 'react-web-notification/lib/components/Notification';
 
@@ -19,6 +27,7 @@ const LOBBY_SETUP = 'lobby_setup';
 const LOBBY_READY = 'lobby_ready';
 const IN_LOBBY = 'in_lobby';
 
+// eslint-disable-next-line no-undef
 const prefix = process.env.NODE_ENV === 'development' ? 'ws' : 'wss';
 const wsUrl = `${prefix}://${window.location.host}/ws/find_match`;
 
@@ -190,7 +199,7 @@ export default class MatchFinder extends React.Component {
         <Notification
           title="Match found"
           options={options}
-          onShow={() => { document.getElementById('sound').play() }}
+          onShow={() => { document.getElementById('sound').play(); }}
         />
         <audio id="sound" preload="auto" loop>
           <source src={source} type="audio/mpeg"/>

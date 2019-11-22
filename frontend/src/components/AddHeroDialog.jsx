@@ -1,9 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
-  Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
-  FormControl, InputLabel, Select, MenuItem,
-} from '@material-ui/core'
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+} from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 
 
@@ -43,7 +50,7 @@ export default function AddHeroDialog({ allHeroes, handleAdd, disabled }) {
                 autoFocus
                 style={{ width: '200px' }}
                 value={heroId}
-                onChange={({target}) => {setHeroId(target.value)}}
+                onChange={({target}) => {setHeroId(target.value);}}
               >
                 {allHeroes.map(hero => (
                   <MenuItem key={hero.id} value={hero.id}>{hero.name}</MenuItem>
@@ -56,7 +63,7 @@ export default function AddHeroDialog({ allHeroes, handleAdd, disabled }) {
               Cancel
             </Button>
             <Button
-              onClick={() => {handleClose(); handleAdd(heroId)}}
+              onClick={() => {handleClose(); handleAdd(heroId);}}
               color="primary"
             >
               Add hero

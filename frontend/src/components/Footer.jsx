@@ -1,8 +1,6 @@
-import React  from 'react';
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faDiscord, faGithub } from '@fortawesome/free-brands-svg-icons'
-import { AppBar, Grid, Button } from '@material-ui/core';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faDiscord, faGithub} from '@fortawesome/free-brands-svg-icons';
+import {AppBar, Button, Grid} from '@material-ui/core';
 
 
 export default function Footer() {

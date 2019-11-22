@@ -1,11 +1,5 @@
-import React from 'react';
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-} from 'react-router-dom';
-
-import { Container } from '@material-ui/core';
+import {BrowserRouter as Router, Route, Switch,} from 'react-router-dom';
+import {Container} from '@material-ui/core';
 
 import About from './About.jsx';
 import Profile from './Profile.jsx';
