@@ -39,6 +39,7 @@ export default class MatchFinder extends React.Component {
 
     this.state = {
       connected: false,
+      waitingForResponse: false,
     };
 
     this.connect();

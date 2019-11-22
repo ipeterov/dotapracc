@@ -1,8 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import { useQuery } from '@apollo/react-hooks';
-import { withStyles } from '@material-ui/core/styles';
 import {
   Avatar, Button, Grid, Menu, MenuItem,
 } from '@material-ui/core';
@@ -22,12 +20,8 @@ const QUERY = gql`
   }
 `;
 
-const styles = {
-  startIcon: { marginRight: 0 },
-};
 
-
-function AvatarSection({ classes }) {
+export default function AvatarSection() {
   const { loading, error, data } = useQuery(QUERY);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
@@ -86,7 +80,6 @@ function AvatarSection({ classes }) {
 
       <Grid item>
         <Button
-          classes={{ startIcon: classes.startIcon }}
           variant="text"
           color="inherit"
           onClick={handleMenu}
@@ -129,9 +122,3 @@ function AvatarSection({ classes }) {
     </Grid>
   );
 }
-
-AvatarSection.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
-
-export default withStyles(styles)(AvatarSection);

@@ -36,10 +36,14 @@ const MyButton = (props) => {
   );
 };
 
+MyButton.defaultProps = {
+  disabled: false,
+};
+
 MyButton.propTypes = {
-  children: PropTypes.object.isRequired,
+  children: PropTypes.string.isRequired,
   loading: PropTypes.bool.isRequired,
-  disabled: PropTypes.bool.isRequired,
+  disabled: PropTypes.bool,
 };
 
 export default MyButton;

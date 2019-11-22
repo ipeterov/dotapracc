@@ -174,7 +174,7 @@ class SelectedHeroes extends React.Component {
               <AddHeroDialog
                 disabled={loading}
                 handleAdd={this.handleAdd}
-                allHeroes={data.allHeroes}
+                allHeroes={data.allHeroes || []}
               />
             </Grid>
             <Grid item>
