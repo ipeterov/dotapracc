@@ -227,20 +227,20 @@ class SelectedHero extends React.Component {
             {this.state.matchupsExpanded &&
               <Grid container justify="center">
                 <ButtonGroup variant="text" size="medium">
-                  <Button onClick={this.toggleHeroes(midlaners)}>
-                    Toggle all mids
-                  </Button>
-                  <Button onClick={this.toggleHeroes(proMatchups)}>
-                    Toggle pro matchups
-                  </Button>
-                </ButtonGroup>
-                <ButtonGroup variant="text" size="medium">
                   <Button onClick={() => {
-                    const ids = this.getIdArray(allHeroes);
-                    this.update({ heroIds: ids });
-                  }
-                  }>
-                    Add all
+                    this.update({ heroIds: midlaners })
+                  }}>
+                    Select all mids
+                  </Button>
+                  <Button onClick={() => {
+                    this.update({ heroIds: proMatchups })
+                  }}>
+                    Select pro matchups
+                  </Button>
+                  <Button onClick={() => {
+                    this.update({ heroIds: this.getIdArray(allHeroes) });
+                  }}>
+                    Select all
                   </Button>
                   <Button onClick={() => {
                     this.update({ heroIds: [] });
