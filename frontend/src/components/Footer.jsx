@@ -1,6 +1,7 @@
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faDiscord, faGithub} from '@fortawesome/free-brands-svg-icons';
-import {AppBar, Button, Grid} from '@material-ui/core';
+import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faDiscord, faGithub } from '@fortawesome/free-brands-svg-icons';
+import { AppBar, Button, Grid } from '@material-ui/core';
 
 
 export default function Footer() {
@@ -15,7 +16,8 @@ export default function Footer() {
       position="relative"
       color="primary"
     >
-      <Grid container
+      <Grid
+        container
         spacing={1}
         justify="center"
         alignItems="center"

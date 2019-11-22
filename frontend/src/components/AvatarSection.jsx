@@ -1,13 +1,15 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
-import {useQuery} from '@apollo/react-hooks';
-import {withStyles} from '@material-ui/core/styles';
-
-import {Avatar, Button, Grid, Menu, MenuItem,} from '@material-ui/core';
+import { useQuery } from '@apollo/react-hooks';
+import { withStyles } from '@material-ui/core/styles';
+import {
+  Avatar, Button, Grid, Menu, MenuItem,
+} from '@material-ui/core';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
-import {Skeleton} from '@material-ui/lab';
+import { Skeleton } from '@material-ui/lab';
 
-import MatchFinder from './MatchFinder.jsx';
+import MatchFinder from './MatchFinder';
 
 
 const QUERY = gql`
@@ -31,23 +33,26 @@ function AvatarSection({ classes }) {
   const open = Boolean(anchorEl);
 
   if (error) return <p>Error :(</p>;
-  if (loading) return (
-    <Grid container
-      direction="row"
-      justify="flex-end"
-      alignItems="center"
-      spacing={1}
-    >
-      <Grid item>
-        <Skeleton variant="rect" width={200} />
+  if (loading) {
+    return (
+      <Grid
+        container
+        direction="row"
+        justify="flex-end"
+        alignItems="center"
+        spacing={1}
+      >
+        <Grid item>
+          <Skeleton variant="rect" width={200} />
+        </Grid>
+        <Grid item>
+          <Skeleton variant="circle" width={40} height={40} />
+        </Grid>
       </Grid>
-      <Grid item>
-        <Skeleton variant="circle" width={40} height={40} />
-      </Grid>
-    </Grid>
-  );
+    );
+  }
 
-  const handleMenu = event => {
+  const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -57,6 +62,7 @@ function AvatarSection({ classes }) {
 
   if (data.viewer == null) {
     return (
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
       <img
         alt="Sign in with Steam"
         src="/static/frontend/steam.png"
@@ -87,12 +93,12 @@ function AvatarSection({ classes }) {
           startIcon={
             <ArrowDropDownIcon />
           }
-          endIcon={
+          endIcon={(
             <Avatar
               alt={data.viewer.personaname}
               src={data.viewer.avatarmedium}
             />
-          }
+          )}
         >
           {data.viewer.personaname}
         </Button>
@@ -123,5 +129,9 @@ function AvatarSection({ classes }) {
     </Grid>
   );
 }
+
+AvatarSection.propTypes = {
+  classes: PropTypes.object.isRequired,
+};
 
 export default withStyles(styles)(AvatarSection);

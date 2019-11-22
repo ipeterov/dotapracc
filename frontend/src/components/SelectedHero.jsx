@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
-import {graphql} from '@apollo/react-hoc';
+import { graphql } from '@apollo/react-hoc';
 import gql from 'graphql-tag';
 import {
   Avatar,
@@ -67,20 +67,20 @@ class SelectedHero extends React.Component {
     };
   }
 
-  getIdArray(matchups) {
+  static getIdArray(matchups) {
     const matchupArray = [];
-    matchups.forEach(matchupDict => {
+    matchups.forEach((matchupDict) => {
       matchupArray.push(matchupDict.id);
     });
     return matchupArray;
   }
 
-  getHeroesByAttr(heroes) {
+  static getHeroesByAttr(heroes) {
     const heroesByAttr = { STRENGTH: [], AGILITY: [], INTELLECT: [] };
-    heroes.forEach(hero => {
+    heroes.forEach((hero) => {
       heroesByAttr[hero.primaryAttribute].push(hero);
     });
-    ['STRENGTH', 'AGILITY', 'INTELLECT'].forEach(attr => {
+    ['STRENGTH', 'AGILITY', 'INTELLECT'].forEach((attr) => {
       heroesByAttr[attr] = _.sortBy(heroesByAttr[attr], ['name']);
     });
     return heroesByAttr;
@@ -90,9 +90,9 @@ class SelectedHero extends React.Component {
     const highlighted = this.state.highlightedHeroId === heroId;
     let greyscalePercent;
     if (matchups.includes(heroId)) {
-      greyscalePercent = highlighted ? 25: 0;
+      greyscalePercent = highlighted ? 25 : 0;
     } else {
-      greyscalePercent = highlighted ? 75: 100;
+      greyscalePercent = highlighted ? 75 : 100;
     }
     return { filter: `grayscale(${greyscalePercent}%)` };
   }
@@ -103,7 +103,7 @@ class SelectedHero extends React.Component {
 
     if ('heroIds' in updates) {
       selectedHero.matchups = updates.heroIds.map(
-        heroId => ({ id: heroId, __typename: 'HeroType' })
+        (heroId) => ({ id: heroId, __typename: 'HeroType' }),
       );
       variables.matchupIds = updates.heroIds;
     }
@@ -120,14 +120,14 @@ class SelectedHero extends React.Component {
         updateOrCreateSelectedHero: {
           __typename: 'UpdateOrCreateSelectedHero',
           selectedHero,
-        }
-      }
+        },
+      },
     });
   }
 
   toggleHeroes(heroIds) {
     return () => {
-      const matchups = this.getIdArray(this.props.selectedHero.matchups);
+      const matchups = SelectedHero.getIdArray(this.props.selectedHero.matchups);
 
       let newMatchups;
       if (_.difference(heroIds, matchups).length) {
@@ -144,28 +144,28 @@ class SelectedHero extends React.Component {
     const { selectedHero, allHeroes } = this.props;
     const { primaryAttribute, attackType, name } = selectedHero.hero;
 
-    const matchups = this.getIdArray(selectedHero.matchups);
-    const midlaners = this.getIdArray(this.props.midlaners);
-    const proMatchups = this.getIdArray(selectedHero.hero.proMatchups);
+    const matchups = SelectedHero.getIdArray(selectedHero.matchups);
+    const midlaners = SelectedHero.getIdArray(this.props.midlaners);
+    const proMatchups = SelectedHero.getIdArray(selectedHero.hero.proMatchups);
 
-    const heroesByAttr = this.getHeroesByAttr(allHeroes);
+    const heroesByAttr = SelectedHero.getHeroesByAttr(allHeroes);
 
     return (
       <Grid item xs={12}>
         <Card>
           <CardHeader
-            avatar={
+            avatar={(
               <Avatar
                 /* eslint-disable-next-line no-undef */
                 src={MEDIA_PREFIX + selectedHero.hero.picture}
                 style={{
                   width: '80px',
                   height: '80px',
-                  filter: `grayscale(${selectedHero.isSwitchedOn ? 0 : 100}%)`
+                  filter: `grayscale(${selectedHero.isSwitchedOn ? 0 : 100}%)`,
                 }}
               />
-            }
-            action={
+            )}
+            action={(
               <div>
                 <Switch
                   checked={selectedHero.isSwitchedOn}
@@ -175,13 +175,14 @@ class SelectedHero extends React.Component {
                 />
                 <IconButton onClick={
                   () => this.props.handleDelete(selectedHero.id)
-                }>
+                }
+                >
                   {this.props.deleting ?
                     <CircularProgress size={24} /> : <CloseIcon />
                   }
                 </IconButton>
               </div>
-            }
+            )}
             title={name}
             titleTypographyProps={{ variant: 'h5' }}
             subheader={`${primaryAttribute}, ${attackType}`}
@@ -189,18 +190,18 @@ class SelectedHero extends React.Component {
 
           <CardContent>
             <Grid container justify="space-between">
-              { this.state.matchupsExpanded &&
+              {this.state.matchupsExpanded && (
                 <Grid item>
-                  <Typography variant={'overline'}>
+                  <Typography variant="overline">
                     Will match with:
                   </Typography>
                 </Grid>
-              }
+              )}
               <Grid item>
                 <Button
-                  onClick={() => this.setState(
-                    {matchupsExpanded: !this.state.matchupsExpanded}
-                  )}
+                  onClick={() => this.setState((prevState) => (
+                    { matchupsExpanded: !prevState.matchupsExpanded }
+                  ))}
                 >
                   {
                     this.state.matchupsExpanded ?
@@ -210,8 +211,8 @@ class SelectedHero extends React.Component {
                 </Button>
               </Grid>
             </Grid>
-            { this.state.matchupsExpanded &&
-              ['STRENGTH', 'AGILITY', 'INTELLECT'].map(attribute => (
+            {this.state.matchupsExpanded &&
+              ['STRENGTH', 'AGILITY', 'INTELLECT'].map((attribute) => (
                 <GridList
                   key={attribute}
                   spacing={1}
@@ -219,7 +220,7 @@ class SelectedHero extends React.Component {
                   cellHeight={44}
                   style={{ marginBottom: '8px' }}
                 >
-                  {heroesByAttr[attribute].map(hero => (
+                  {heroesByAttr[attribute].map((hero) => (
                     <GridListTile
                       key={hero.picture}
                       onMouseDown={this.toggleHeroes([hero.id])}
@@ -237,32 +238,36 @@ class SelectedHero extends React.Component {
                 </GridList>
               ))
             }
-            {this.state.matchupsExpanded &&
+            {this.state.matchupsExpanded && (
               <Grid container justify="center">
                 <ButtonGroup variant="text" size="medium">
                   <Button onClick={() => {
                     this.update({ heroIds: midlaners });
-                  }}>
+                  }}
+                  >
                     Select all mids
                   </Button>
                   <Button onClick={() => {
                     this.update({ heroIds: proMatchups });
-                  }}>
+                  }}
+                  >
                     Select pro matchups
                   </Button>
                   <Button onClick={() => {
-                    this.update({ heroIds: this.getIdArray(allHeroes) });
-                  }}>
+                    this.update({ heroIds: SelectedHero.getIdArray(allHeroes) });
+                  }}
+                  >
                     Select all
                   </Button>
                   <Button onClick={() => {
                     this.update({ heroIds: [] });
-                  }}>
+                  }}
+                  >
                     Clear
                   </Button>
                 </ButtonGroup>
               </Grid>
-            }
+            )}
           </CardContent>
         </Card>
       </Grid>

@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactTimeAgo from 'react-time-ago';
 import autoBind from 'react-autobind';
-import {w3cwebsocket as W3CWebSocket} from 'websocket';
+import { w3cwebsocket as W3CWebSocket } from 'websocket';
 import {
   Dialog,
   DialogActions,
@@ -17,7 +17,7 @@ import {
 } from '@material-ui/core';
 import Notification from 'react-web-notification/lib/components/Notification';
 
-import MyButton from './MyButton.jsx';
+import MyButton from './MyButton';
 
 
 const SEARCHING = 'searching';
@@ -128,7 +128,7 @@ export default class MatchFinder extends React.Component {
         spacing={1}
         alignItems="center"
       >
-        <Grid item >
+        <Grid item>
           <Typography variant="overline">
             Searching for:{' '}
             <ReactTimeAgo
@@ -149,7 +149,7 @@ export default class MatchFinder extends React.Component {
             />
           </Typography>
         </Grid>
-        <Grid item >
+        <Grid item>
           <MyButton
             onClick={this.sendCommand('cancel')}
             variant="contained"
@@ -166,13 +166,13 @@ export default class MatchFinder extends React.Component {
   renderFoundMatchDialog() {
     const source = '/static/frontend/match_found.mp3';
     const options = {
-      body: 'Opponent: ' + this.state.opponent.personaName,
+      body: `Opponent: ${this.state.opponent.personaName}`,
       audio: source,
     };
 
     return (
       <>
-        <Dialog open={true}>
+        <Dialog open>
           <DialogTitle>Found match</DialogTitle>
           <DialogContent>
             {this.renderOpponentDetails()}
@@ -201,17 +201,18 @@ export default class MatchFinder extends React.Component {
           options={options}
           onShow={() => { document.getElementById('sound').play(); }}
         />
+        {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
         <audio id="sound" preload="auto" loop>
-          <source src={source} type="audio/mpeg"/>
-          <embed hidden="true" autostart="false" loop="true" src={source}/>
+          <source src={source} type="audio/mpeg" />
+          <embed hidden="true" autostart="false" loop="true" src={source} />
         </audio>
       </>
     );
   }
 
-  renderWaitingForAcceptDialog() {
+  static renderWaitingForAcceptDialog() {
     return (
-      <Dialog open={true}>
+      <Dialog open>
         <DialogTitle>Waiting for other player to accept</DialogTitle>
         <DialogContent>
           <LinearProgress />
@@ -220,9 +221,9 @@ export default class MatchFinder extends React.Component {
     );
   }
 
-  renderWaitingForLobbyDialog() {
+  static renderWaitingForLobbyDialog() {
     return (
-      <Dialog open={true}>
+      <Dialog open>
         <DialogTitle>Bot dispatched to create lobby</DialogTitle>
         <DialogContent>
           <img
@@ -235,9 +236,9 @@ export default class MatchFinder extends React.Component {
     );
   }
 
-  renderLobbyReadyDialog() {
+  static renderLobbyReadyDialog() {
     return (
-      <Dialog open={true}>
+      <Dialog open>
         <DialogTitle>Lobby created, waiting for players to join</DialogTitle>
         <DialogContent>
           <LinearProgress />
@@ -246,9 +247,9 @@ export default class MatchFinder extends React.Component {
     );
   }
 
-  renderWaitingInLobbyDialog() {
+  static renderWaitingInLobbyDialog() {
     return (
-      <Dialog open={true}>
+      <Dialog open>
         <DialogTitle>Waiting for other player to join lobby</DialogTitle>
         <DialogContent>
           <LinearProgress />
@@ -262,39 +263,44 @@ export default class MatchFinder extends React.Component {
 
     if (state === SEARCHING) {
       return this.renderCancelButton();
-    } else if (state === FOUND_MATCH) {
+    }
+    if (state === FOUND_MATCH) {
       return (
         <>
           <Typography>Found match</Typography>
           {this.renderFoundMatchDialog()}
         </>
       );
-    } else if (state === ACCEPTED_MATCH) {
+    }
+    if (state === ACCEPTED_MATCH) {
       return (
         <>
           <Typography>Waiting for other player to accept</Typography>
-          {this.renderWaitingForAcceptDialog()}
+          {MatchFinder.renderWaitingForAcceptDialog()}
         </>
       );
-    } else if (state === LOBBY_SETUP) {
+    }
+    if (state === LOBBY_SETUP) {
       return (
         <>
           <Typography>Setting up lobby</Typography>
-          {this.renderWaitingForLobbyDialog()}
+          {MatchFinder.renderWaitingForLobbyDialog()}
         </>
       );
-    } else if (state === LOBBY_READY) {
+    }
+    if (state === LOBBY_READY) {
       return (
         <>
           <Typography>Lobby created, waiting for players to join</Typography>
-          {this.renderLobbyReadyDialog()}
+          {MatchFinder.renderLobbyReadyDialog()}
         </>
       );
-    } else if (state === IN_LOBBY) {
+    }
+    if (state === IN_LOBBY) {
       return (
         <>
           <Typography>Waiting for other player to join</Typography>
-          {this.renderWaitingInLobbyDialog()}
+          {MatchFinder.renderWaitingInLobbyDialog()}
         </>
       );
     }

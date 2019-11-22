@@ -37,7 +37,7 @@ export default function AddHeroDialog({ allHeroes, handleAdd, disabled }) {
         <AddIcon />
         Add hero to train
       </Button>
-      { !disabled && (
+      {!disabled && (
         <Dialog open={open} onClose={handleClose}>
           <DialogContent>
             <DialogContentText>
@@ -50,9 +50,9 @@ export default function AddHeroDialog({ allHeroes, handleAdd, disabled }) {
                 autoFocus
                 style={{ width: '200px' }}
                 value={heroId}
-                onChange={({target}) => {setHeroId(target.value);}}
+                onChange={({ target }) => { setHeroId(target.value); }}
               >
-                {allHeroes.map(hero => (
+                {allHeroes.map((hero) => (
                   <MenuItem key={hero.id} value={hero.id}>{hero.name}</MenuItem>
                 ))}
               </Select>
@@ -63,7 +63,7 @@ export default function AddHeroDialog({ allHeroes, handleAdd, disabled }) {
               Cancel
             </Button>
             <Button
-              onClick={() => {handleClose(); handleAdd(heroId);}}
+              onClick={() => { handleClose(); handleAdd(heroId); }}
               color="primary"
             >
               Add hero
@@ -78,4 +78,5 @@ export default function AddHeroDialog({ allHeroes, handleAdd, disabled }) {
 AddHeroDialog.propTypes = {
   handleAdd: PropTypes.func.isRequired,
   disabled: PropTypes.bool.isRequired,
+  allHeroes: PropTypes.array.isRequired,
 };

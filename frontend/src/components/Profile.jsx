@@ -1,7 +1,8 @@
-import {Grid, Typography} from '@material-ui/core';
+import React from 'react';
+import { Grid, Typography } from '@material-ui/core';
 
-import SelectedHeroes from './SelectedHeroes.jsx';
-import ProfileVariables from './ProfileVariables.jsx';
+import SelectedHeroes from './SelectedHeroes';
+import ProfileVariables from './ProfileVariables';
 
 
 export default function Profile() {

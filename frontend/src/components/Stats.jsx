@@ -1,9 +1,9 @@
 import _ from 'lodash';
 import React from 'react';
 import autoBind from 'react-autobind';
-import {w3cwebsocket as W3CWebSocket} from 'websocket';
-import {Grid, Typography} from '@material-ui/core';
-import {Skeleton} from '@material-ui/lab';
+import { w3cwebsocket as W3CWebSocket } from 'websocket';
+import { Grid, Typography } from '@material-ui/core';
+import { Skeleton } from '@material-ui/lab';
 
 // eslint-disable-next-line no-undef
 const prefix = process.env.NODE_ENV === 'development' ? 'ws' : 'wss';
@@ -40,17 +40,11 @@ export default class Stats extends React.Component {
   }
 
   renderStats() {
-    if (this.state.loading) return (
-      <Skeleton variant="rect" height={24} />
-    );
+    if (this.state.loading) return <Skeleton variant="rect" height={24} />;
 
     return (
       <Typography color="textSecondary">
-        {
-          _.map(this.state.stats, (value, name) => {
-            return `${name}: ${value}`;
-          }).join(' | ')
-        }
+        {_.map(this.state.stats, (value, name) => `${name}: ${value}`).join(' | ')}
       </Typography>
     );
   }
@@ -59,10 +53,11 @@ export default class Stats extends React.Component {
     return (
       <Grid container direction="row" justify="space-between">
         <Grid item />
-        <Grid item
-          style={ this.state.loading ? { width: '580px' } : {} }
+        <Grid
+          item
+          style={this.state.loading ? { width: '580px' } : {}}
         >
-          { this.renderStats() }
+          {this.renderStats()}
         </Grid>
       </Grid>
     );

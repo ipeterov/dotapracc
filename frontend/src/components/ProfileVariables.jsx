@@ -1,11 +1,11 @@
 import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
-import {graphql} from '@apollo/react-hoc';
-import {compose} from 'recompose';
+import { graphql } from '@apollo/react-hoc';
+import { compose } from 'recompose';
 import gql from 'graphql-tag';
-import {TextField, Typography} from '@material-ui/core';
-import {Skeleton} from '@material-ui/lab';
+import { TextField, Typography } from '@material-ui/core';
+import { Skeleton } from '@material-ui/lab';
 
 
 const PROFILE_FRAGMENT = gql`
@@ -50,8 +50,8 @@ class ProfileVariables extends React.Component {
           updateViewerProfile: {
             __typename: 'updateViewerProfile',
             viewer,
-          }
-        }
+          },
+        },
       });
     };
   }
@@ -62,15 +62,15 @@ class ProfileVariables extends React.Component {
 
     if (error) return <p>Error :(</p>;
 
-    if (!loading && data.viewer == null) return (
-      <Typography>
-        Log in to be able to configure your profile.
-      </Typography>
-    );
+    if (!loading && data.viewer == null) {
+      return (
+        <Typography>
+          Log in to be able to configure your profile.
+        </Typography>
+      );
+    }
 
-    if (loading) return (
-      <Skeleton variant="rect" height={48} />
-    );
+    if (loading) return <Skeleton variant="rect" height={48} />;
 
     return (
       <TextField
@@ -87,6 +87,7 @@ class ProfileVariables extends React.Component {
 
 ProfileVariables.propTypes = {
   mutate: PropTypes.func.isRequired,
+  data: PropTypes.object.isRequired,
 };
 
 export default compose(

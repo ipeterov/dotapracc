@@ -3,7 +3,7 @@ module.exports = {
     'browser': true,
     'es6': true
   },
-  'extends': 'eslint:recommended',
+  'extends': 'airbnb',
   'globals': {
     'Atomics': 'readonly',
     'SharedArrayBuffer': 'readonly'
@@ -61,6 +61,7 @@ module.exports = {
     'react-hooks/exhaustive-deps': 'error',
     'react/jsx-props-no-spreading': 'off',
     'react/no-deprecated': 'warn',
+    'react/no-unescaped-entities': 'off',
     'max-classes-per-file': 'off',
     'react/jsx-curly-newline': 'off', // TODO: reevaluate
     'react/static-property-placement': 'off'

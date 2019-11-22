@@ -2,17 +2,19 @@ import _ from 'lodash';
 import React from 'react';
 import autoBind from 'react-autobind';
 import PropTypes from 'prop-types';
-import {graphql} from '@apollo/react-hoc';
-import {compose} from 'recompose';
+import { graphql } from '@apollo/react-hoc';
+import { compose } from 'recompose';
 import gql from 'graphql-tag';
-import {Button, CircularProgress, Grid, Typography,} from '@material-ui/core';
-import {Skeleton} from '@material-ui/lab';
+import {
+  Button, CircularProgress, Grid, Typography,
+} from '@material-ui/core';
+import { Skeleton } from '@material-ui/lab';
 
 import SelectedHero, {
   SELECTED_HERO_FRAGMENT,
   UPDATE_OR_CREATE_SELECTED_HERO,
-} from './SelectedHero.jsx';
-import AddHeroDialog from './AddHeroDialog.jsx';
+} from './SelectedHero';
+import AddHeroDialog from './AddHeroDialog';
 
 
 const QUERY = gql`
@@ -60,34 +62,33 @@ class SelectedHeroes extends React.Component {
 
   handleAdd(heroId) {
     this.setState({ adding: true },
-      () => {
+      (prevState) => {
         this.props.updateOrCreate({
           variables: { heroId },
           refetchQueries: [{ query: QUERY }],
           awaitRefetchQueries: true,
         }).then(() => {
-          const added = [heroId].concat(this.state.added);
+          const added = [heroId].concat(prevState.added);
           this.setState({ adding: false, added });
         });
-      }
-    );
+      });
   }
 
   handleDelete(selectedHeroId) {
     this.setState(
-      {deleting: this.state.deleting.concat([selectedHeroId])},
-      () => {
+      (prevState) => ({ deleting: prevState.deleting.concat([selectedHeroId]) }),
+      (prevState) => {
         this.props.delete({
           variables: {
-            selectedHeroId: selectedHeroId
+            selectedHeroId,
           },
           refetchQueries: [
-            { query: QUERY }
-          ]
+            { query: QUERY },
+          ],
         }).then(() => {
           const newDeleting = _.filter(
-            this.state.deleting,
-            id => id !== selectedHeroId,
+            prevState.deleting,
+            (id) => id !== selectedHeroId,
           );
           this.setState({ deleting: newDeleting });
         });
@@ -99,8 +100,8 @@ class SelectedHeroes extends React.Component {
     this.props.toggleSelectedHeroes({
       variables: { toggleTo },
       refetchQueries: [
-        { query: QUERY }
-      ]
+        { query: QUERY },
+      ],
     });
   }
 
@@ -143,7 +144,7 @@ class SelectedHeroes extends React.Component {
     );
   }
 
-  renderSkeletons() {
+  static renderSkeletons() {
     return _.times(1, (i) => (
       <Grid key={i} item style={{ width: '100%' }}>
         <Skeleton variant="rect" height={188.5} />
@@ -157,11 +158,13 @@ class SelectedHeroes extends React.Component {
 
     if (error) return <p>Error :(</p>;
 
-    if (!loading && data.viewer == null) return (
-      <Typography>
+    if (!loading && data.viewer == null) {
+      return (
+        <Typography>
         Log in to be able to train heroes.
-      </Typography>
-    );
+        </Typography>
+      );
+    }
 
     return (
       <Grid container spacing={2} direction="column">
@@ -194,7 +197,7 @@ class SelectedHeroes extends React.Component {
         </Grid>
         <Grid item>
           <Grid container spacing={2}>
-            { loading ? this.renderSkeletons() : this.renderSelectedHeroes(data)}
+            {loading ? SelectedHeroes.renderSkeletons() : this.renderSelectedHeroes(data)}
           </Grid>
         </Grid>
       </Grid>
@@ -205,12 +208,13 @@ class SelectedHeroes extends React.Component {
 SelectedHeroes.propTypes = {
   delete: PropTypes.func.isRequired,
   updateOrCreate: PropTypes.func.isRequired,
+  toggleSelectedHeroes: PropTypes.func.isRequired,
   data: PropTypes.object.isRequired,
 };
 
 export default compose(
   graphql(QUERY),
-  graphql(DELETE_SELECTED_HERO, {name: 'delete'}),
-  graphql(UPDATE_OR_CREATE_SELECTED_HERO, {name: 'updateOrCreate'}),
-  graphql(TOGGLE_SELECTED_HEROES, {name: 'toggleSelectedHeroes'}),
+  graphql(DELETE_SELECTED_HERO, { name: 'delete' }),
+  graphql(UPDATE_OR_CREATE_SELECTED_HERO, { name: 'updateOrCreate' }),
+  graphql(TOGGLE_SELECTED_HEROES, { name: 'toggleSelectedHeroes' }),
 )(SelectedHeroes);
