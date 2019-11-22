@@ -48,6 +48,10 @@ def calculate_average_queue_time(days):
             .annotate(duration=duration)
             .values_list('duration', flat=True)
     )
+
+    if not durations:
+        return '0s'
+
     in_seconds = [td.total_seconds() for td in durations if td is not None]
     raw = int(sum(in_seconds) / len(in_seconds))
     return f'{raw}s'
