@@ -25,9 +25,9 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='hero',
             name='pro_matchups',
-            field=models.ManyToManyField(blank=True, related_name='_hero_pro_matchups_+', to='core.Hero'),
+            field=models.ManyToManyField(
+                blank=True, related_name='_hero_pro_matchups_+', to='core.Hero'
+            ),
         ),
-        migrations.DeleteModel(
-            name='HeroMatchup',
-        ),
+        migrations.DeleteModel(name='HeroMatchup', ),
     ]

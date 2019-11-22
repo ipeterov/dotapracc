@@ -1,7 +1,5 @@
-from django.db import transaction
-
-from .models import Hero
 from .dotabuff import DotaBuffAPI, LANES
+from .models import Hero
 from .opendota import OpenDotaAPI
 
 
@@ -36,10 +34,7 @@ class HeroSyncer:
         return heroes
 
     def import_meta(self, heroes):
-        heroes_by_name = {
-            hero.name: hero
-            for hero in heroes
-        }
+        heroes_by_name = {hero.name: hero for hero in heroes}
 
         for lane in LANES:
             print(f'Fetching {lane} meta...')
@@ -54,9 +49,7 @@ class HeroSyncer:
             hero.save()
 
     def import_pro_matchups(self, heroes):
-        hero_id_by_opendota_id = dict(
-            Hero.objects.values_list('opendota_id', 'id')
-        )
+        hero_id_by_opendota_id = dict(Hero.objects.values_list('opendota_id', 'id'))
 
         for i, hero in enumerate(heroes):
             print(f'Getting pro matchups of {hero.name} ({i}/{len(heroes)})...')

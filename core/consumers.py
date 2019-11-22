@@ -17,10 +17,7 @@ class MatchFinderConsumer(WebsocketConsumer):
         self.accept()
 
         if current_search:
-            PlayerSearch.objects.update_channel(
-                current_search,
-                self.channel_name
-            )
+            PlayerSearch.objects.update_channel(current_search, self.channel_name)
 
     def receive(self, text_data=None, bytes_data=None):
         command = text_data
@@ -43,10 +40,7 @@ class MatchFinderConsumer(WebsocketConsumer):
 
         assert current_search is not None
 
-        PlayerSearch.objects.update_channel(
-            current_search,
-            self.channel_name
-        )
+        PlayerSearch.objects.update_channel(current_search, self.channel_name)
 
         if command == 'accept_match':
             PlayerSearch.objects.accept_match(current_search)

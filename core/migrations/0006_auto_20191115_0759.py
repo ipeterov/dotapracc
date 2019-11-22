@@ -12,6 +12,8 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddConstraint(
             model_name='heromatchup',
-            constraint=models.UniqueConstraint(fields=('hero', 'other_hero'), name='only_one_value_per_pair'),
+            constraint=models.UniqueConstraint(
+                fields=('hero', 'other_hero'), name='only_one_value_per_pair'
+            ),
         ),
     ]

@@ -47,5 +47,8 @@ def push_stats():
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
         'stats',
-        {'type': 'websocket.stats', 'message': get_stats_as_string()},
+        {
+            'type': 'websocket.stats',
+            'message': get_stats_as_string()
+        },
     )

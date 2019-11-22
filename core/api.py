@@ -47,16 +47,9 @@ class UpdateOrCreateSelectedHero(graphene.Mutation):
         )
 
         if created and matchup_ids is None:
-            matchup_ids = (
-                Hero.objects
-                    .lane_occupants('mid')
-                    .values_list('id', flat=True)
-            )
+            matchup_ids = (Hero.objects.lane_occupants('mid').values_list('id', flat=True))
 
-        if (
-            is_switched_on is not None and
-            selected_hero.is_switched_on != is_switched_on
-        ):
+        if is_switched_on is not None and selected_hero.is_switched_on != is_switched_on:
             selected_hero.is_switched_on = is_switched_on
             selected_hero.save()
 

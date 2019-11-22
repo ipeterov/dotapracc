@@ -1,15 +1,14 @@
 import json
-import time
 import random
+import time
 from collections import defaultdict
 
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-from django_fsm import FSMField, transition
-
 from django.conf import settings
 from django.db import models, transaction
 from django.utils.timezone import now
+from django_fsm import FSMField, transition
 
 from authentication.models import SteamUser
 from .tasks import invite_players
@@ -22,9 +21,7 @@ class HeroQuerySet(models.QuerySet):
         if cutoff is None:
             cutoff = settings.LANE_PRESENCE_CUTOFF
 
-        condition = {
-            Hero.FIELD_MAP[lane] + '__gte': cutoff
-        }
+        condition = {Hero.FIELD_MAP[lane] + '__gte': cutoff}
         return self.filter(**condition)
 
 
@@ -40,15 +37,20 @@ class Hero(models.Model):
     picture = models.ImageField(upload_to='hero_images')
     opendota_id = models.IntegerField(unique=True)
 
-    primary_attribute = models.CharField(max_length=9, choices=(
-        ('Strength', 'Strength'),
-        ('Intellect', 'Intellect'),
-        ('Agility', 'Agility'),
-    ))
-    attack_type = models.CharField(max_length=6, choices=(
-        ('Melee', 'Melee'),
-        ('Ranged', 'Ranged'),
-    ))
+    primary_attribute = models.CharField(
+        max_length=9,
+        choices=(
+            ('Strength', 'Strength'),
+            ('Intellect', 'Intellect'),
+            ('Agility', 'Agility'),
+        )
+    )
+    attack_type = models.CharField(
+        max_length=6, choices=(
+            ('Melee', 'Melee'),
+            ('Ranged', 'Ranged'),
+        )
+    )
 
     midlane_presence = models.FloatField(default=0)
     safelane_presence = models.FloatField(default=0)
@@ -70,10 +72,7 @@ class Hero(models.Model):
 
 class SelectedHeroQuerySet(models.QuerySet):
     def as_dict(self):
-        return {
-            sh.hero.name: sh.matchups.values_list('name', flat=True)
-            for sh in self.all()
-        }
+        return {sh.hero.name: sh.matchups.values_list('name', flat=True) for sh in self.all()}
 
     def as_reverse_dict(self):
         reverse = defaultdict(list)
@@ -88,13 +87,19 @@ class SelectedHeroQuerySet(models.QuerySet):
 
 class SelectedHero(models.Model):
     user = models.ForeignKey(
-        SteamUser, on_delete=models.CASCADE, related_name='selected_heroes',
+        SteamUser,
+        on_delete=models.CASCADE,
+        related_name='selected_heroes',
     )
     hero = models.ForeignKey(
-        Hero, on_delete=models.CASCADE, related_name='+',
+        Hero,
+        on_delete=models.CASCADE,
+        related_name='+',
     )
     matchups = models.ManyToManyField(
-        Hero, blank=True, related_name='+',
+        Hero,
+        blank=True,
+        related_name='+',
     )
     is_switched_on = models.BooleanField(default=True)
 
@@ -212,10 +217,15 @@ class PlayerSearch(models.Model):
     ]
 
     user = models.ForeignKey(
-        SteamUser, on_delete=models.CASCADE, related_name='searches',
+        SteamUser,
+        on_delete=models.CASCADE,
+        related_name='searches',
     )
     match = models.ForeignKey(
-        'self', on_delete=models.SET_NULL, blank=True, null=True,
+        'self',
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
         related_name='+',
     )
 

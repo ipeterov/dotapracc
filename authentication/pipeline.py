@@ -36,9 +36,7 @@ def user_details(user, details, strategy, *args, **kwargs):
 def associate_existing_user(uid, *args, **kwargs):
     """If there already is an user with the given steamid, hand it over to the pipeline"""
     if SteamUser.objects.filter(steamid=uid).exists():
-        return {
-            'user': SteamUser.objects.get(steamid=uid)
-        }
+        return {'user': SteamUser.objects.get(steamid=uid)}
 
 
 def sync_with_opendota(uid, *args, **kwargs):

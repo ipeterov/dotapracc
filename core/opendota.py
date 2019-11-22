@@ -1,11 +1,10 @@
 import math
 
 import requests
-from requests.compat import urljoin
-
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.utils.text import slugify
+from requests.compat import urljoin
 
 
 # https://www.evanmiller.org/how-not-to-sort-by-average-rating.html
@@ -17,11 +16,8 @@ def wilson_score(up, down):
     z = 1.64485
     phat = up / n
     return (
-        phat + ((z * z) / (2 * n)) -
-        (z * math.sqrt(((phat * (1 - phat)) + (z * z / (4 * n))) / n))
-    ) / (
-        1 + (z * z / n)
-    )
+        phat + ((z * z) / (2 * n)) - (z * math.sqrt(((phat * (1 - phat)) + (z * z / (4 * n))) / n))
+    ) / (1 + (z * z / n))
 
 
 PRO_MATCHUPS_QUERY = '''

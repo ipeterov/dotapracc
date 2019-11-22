@@ -3,8 +3,8 @@ from contextlib import contextmanager
 from secrets import token_hex
 
 import gevent
-from steam import SteamClient
 from dota2 import Dota2Client
+from steam import SteamClient
 
 
 @contextmanager
@@ -53,12 +53,9 @@ def invite(steam_ids, bot_account, lobby_name):
 
     @dota.once('ready')
     def create_a_lobby():
-        dota.create_practice_lobby(
-            password=token_hex(16),
-            options={
-                'game_name': lobby_name,
-            }
-        )
+        dota.create_practice_lobby(password=token_hex(16), options={
+            'game_name': lobby_name,
+        })
 
     @dota.once('lobby_new')
     def setup_and_invite_all(lobby):
@@ -68,14 +65,8 @@ def invite(steam_ids, bot_account, lobby_name):
 
     @dota.on('lobby_changed')
     def handle_change(lobby):
-        in_lobby = {
-            member.id for member in lobby.members
-            if member.id in steam_ids
-        }
-        pending = {
-            steamid for steamid in lobby.pending_invites
-            if steamid in steam_ids
-        }
+        in_lobby = {member.id for member in lobby.members if member.id in steam_ids}
+        pending = {steamid for steamid in lobby.pending_invites if steamid in steam_ids}
         leavers = set(steam_ids) - (in_lobby | pending)
 
         nonlocal yielded

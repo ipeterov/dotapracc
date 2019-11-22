@@ -14,22 +14,20 @@ def get_stats_as_string(days=7):
 
 def get_stats(days=7):
     return {
-        f'Active players (over {days}d)':
-            calculate_active_players(days),
+        f'Active players (over {days}d)': calculate_active_players(days),
         'Searching now': calculate_searching_now(),
-        f'Average queue time (over {days}d)':
-            calculate_average_queue_time(days),
+        f'Average queue time (over {days}d)': calculate_average_queue_time(days),
     }
 
 
 def calculate_active_players(days):
     """Number of players who searched for a game in past n days"""
     threshold = now() - timedelta(days=days)
-    steamids = (
-        PlayerSearch.objects
-            .filter(started_at__gt=threshold)
-            .values_list('user__steamid', flat=True)
+    steamids = PlayerSearch.objects.filter(started_at__gt=threshold, ).values_list(
+        'user__steamid',
+        flat=True,
     )
+
     return len(set(steamids))
 
 
@@ -42,12 +40,13 @@ def calculate_average_queue_time(days):
         F('ended_at') - F('started_at'), output_field=fields.DurationField()
     )
     threshold = now() - timedelta(days=days)
-    durations = (
-        PlayerSearch.objects
-            .filter(started_at__gt=threshold, state=PlayerSearch.SUCCESS)
-            .annotate(duration=duration)
-            .values_list('duration', flat=True)
-    )
+
+    durations = PlayerSearch.objects.filter(started_at__gt=threshold,
+                                            state=PlayerSearch.SUCCESS).annotate(duration=duration
+                                                                                ).values_list(
+                                                                                    'duration',
+                                                                                    flat=True,
+                                                                                )
 
     if not durations:
         return '0s'

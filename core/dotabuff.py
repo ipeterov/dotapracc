@@ -1,9 +1,7 @@
 import requests
-from requests.compat import urljoin
 from bs4 import BeautifulSoup
-
 from django.conf import settings
-
+from requests.compat import urljoin
 
 LANES = ('mid', 'safe', 'off', 'jungle')
 
@@ -16,9 +14,7 @@ class DotaBuffAPI:
         if params is None:
             params = {}
         full_url = urljoin(self.url, url)
-        headers = {
-            'User-Agent': settings.DOTABUFF_SCRAPE_USER_AGENT
-        }
+        headers = {'User-Agent': settings.DOTABUFF_SCRAPE_USER_AGENT}
         response = requests.get(full_url, params=params, headers=headers)
         return BeautifulSoup(response.text, 'html.parser')
 
