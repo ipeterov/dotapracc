@@ -16,6 +16,7 @@ import {
   GridListTile,
   IconButton,
   Switch,
+  Tooltip,
   Typography,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
@@ -240,23 +241,27 @@ class SelectedHero extends React.Component {
               <Grid container justify="center">
                 <ButtonGroup variant="text" size="medium">
                   <Button onClick={() => {
-                    this.update({ heroIds: midlaners });
-                  }}
-                  >
-                    Select all mids
-                  </Button>
-                  <Button onClick={() => {
-                    this.update({ heroIds: proMatchups });
-                  }}
-                  >
-                    Select pro matchups
-                  </Button>
-                  <Button onClick={() => {
                     this.update({ heroIds: SelectedHero.getIdArray(allHeroes) });
                   }}
                   >
                     Select all
                   </Button>
+                  <Tooltip title="Using OpenDota hero lane presences">
+                    <Button onClick={() => {
+                      this.update({ heroIds: midlaners });
+                    }}
+                    >
+                      Select all mids
+                    </Button>
+                  </Tooltip>
+                  <Tooltip title="Where there is at least one pro match with this matchup">
+                    <Button onClick={() => {
+                      this.update({ heroIds: proMatchups });
+                    }}
+                    >
+                      Select pro matchups
+                    </Button>
+                  </Tooltip>
                   <Button onClick={() => {
                     this.update({ heroIds: [] });
                   }}
