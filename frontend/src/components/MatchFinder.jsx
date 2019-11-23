@@ -205,7 +205,7 @@ export default class MatchFinder extends React.Component {
         {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
         <audio id="sound" preload="auto" loop>
           <source src={source} type="audio/mpeg" />
-          <embed hidden="true" autostart="false" loop="true" src={source} />
+          <embed hidden loop autostart="false" src={source} />
         </audio>
       </>
     );
