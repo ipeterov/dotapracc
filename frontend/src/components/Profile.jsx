@@ -7,7 +7,7 @@ import ProfileVariables from './ProfileVariables';
 
 export default function Profile() {
   return (
-    <Grid container spacing={2} direction="column">
+    <Grid container spacing={3} direction="column">
       <Grid item>
         <Typography variant="h5" style={{ marginBottom: 8 }}>
           Profile

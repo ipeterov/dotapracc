@@ -72,7 +72,7 @@ export default function AvatarSection() {
       container
       direction="row"
       alignItems="center"
-      spacing={2}
+      spacing={1}
     >
       <Grid item>
         <MatchFinder />

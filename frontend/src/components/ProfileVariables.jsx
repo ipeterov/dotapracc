@@ -74,7 +74,7 @@ class ProfileVariables extends React.Component {
 
     return (
       <TextField
-        label="Custom message (will be shown to opponent when match is found)"
+        label="Your profile message (will be shown to the opponent when a match is found)"
         onChange={this.handleChange('profileText')}
         value={data.viewer.profileText}
         fullWidth
