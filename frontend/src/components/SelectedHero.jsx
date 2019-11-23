@@ -157,10 +157,11 @@ class SelectedHero extends React.Component {
           <CardHeader
             avatar={(
               <Avatar
+                variant="rounded"
                 src={selectedHero.hero.picture}
                 style={{
-                  width: '80px',
-                  height: '80px',
+                  width: '128px',
+                  height: '72px',
                   filter: `grayscale(${selectedHero.isSwitchedOn ? 0 : 100}%)`,
                 }}
               />

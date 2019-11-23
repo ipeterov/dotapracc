@@ -148,7 +148,7 @@ class SelectedHeroes extends React.Component {
   static renderSkeletons() {
     return _.times(2, (i) => (
       <Grid key={i} item style={{ width: '100%' }}>
-        <Skeleton variant="rect" height={188.5} />
+        <Skeleton variant="rect" height={180.5} />
       </Grid>
     ));
   }
