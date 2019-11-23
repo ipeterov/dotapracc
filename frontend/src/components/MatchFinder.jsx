@@ -62,7 +62,7 @@ export default class MatchFinder extends React.Component {
       this.setState({ connected: false });
       setTimeout(() => {
         this.connect();
-      }, 1000);
+      }, 5000);
     };
   }
 

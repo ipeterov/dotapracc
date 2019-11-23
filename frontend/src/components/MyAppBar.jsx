@@ -50,6 +50,16 @@ export default function MyAppBar() {
                   About
                 </Link>
               </Grid>
+              <Grid item>
+                <Link
+                  variant="overline"
+                  color="inherit"
+                  component={RouterLink}
+                  to="/refs/"
+                >
+                  Referrals
+                </Link>
+              </Grid>
             </Grid>
           </Grid>
 

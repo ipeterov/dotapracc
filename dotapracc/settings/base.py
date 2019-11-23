@@ -30,15 +30,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'django_celery_beat',
     'channels',
     'graphene_django',
     'social_django',
     'imagekit',
+    'pinax.referrals',
     'authentication',
     'core',
     'frontend',
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -46,6 +50,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'pinax.referrals.middleware.SessionJumpingMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -193,6 +198,9 @@ SOCIAL_AUTH_PIPELINE = (
 
     # Sync with OpenDota
     'authentication.pipeline.sync_with_opendota',
+
+    # Count registration towards referral count
+    'authentication.pipeline.count_referral',
 )
 
 GRAPHENE = {

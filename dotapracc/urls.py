@@ -24,6 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('graphiql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
     path('gql/', csrf_exempt(GraphQLView.as_view())),
+    path('r/', include('pinax.referrals.urls', namespace='pinax_referrals')),
     path('', include('social_django.urls', namespace='social')),
     path('', include('frontend.urls')),
 ]

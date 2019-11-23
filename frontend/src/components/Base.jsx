@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { Container } from '@material-ui/core';
 
 import About from './About';
+import Referrals from './Referrals';
 import Profile from './Profile';
 import MyAppBar from './MyAppBar';
 import Stats from './Stats';
@@ -23,6 +24,9 @@ export default function Base() {
       >
         <Stats />
         <Switch>
+          <Route path="/refs/">
+            <Referrals />
+          </Route>
           <Route path="/about/">
             <About />
           </Route>

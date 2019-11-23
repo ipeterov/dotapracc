@@ -35,7 +35,7 @@ export default class Stats extends React.Component {
       this.setState({ loading: true });
       setTimeout(() => {
         this.connect();
-      }, 1000);
+      }, 5000);
     };
   }
 

@@ -1,3 +1,5 @@
+from pinax.referrals.models import Referral
+
 from .models import SteamUser
 from .tasks import sync_user_with_opendota
 
@@ -39,5 +41,10 @@ def associate_existing_user(uid, *args, **kwargs):
         return {'user': SteamUser.objects.get(steamid=uid)}
 
 
-def sync_with_opendota(uid, *args, **kwargs):
+def sync_with_opendota(uid, **kwargs):
     sync_user_with_opendota.delay(steamid=uid)
+
+
+def count_referral(request, is_new, **kwargs):
+    if is_new:
+        Referral.record_response(request, 'REGISTER')

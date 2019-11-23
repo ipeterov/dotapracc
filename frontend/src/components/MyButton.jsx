@@ -37,12 +37,13 @@ const MyButton = (props) => {
 };
 
 MyButton.defaultProps = {
+  loading: false,
   disabled: false,
 };
 
 MyButton.propTypes = {
   children: PropTypes.string.isRequired,
-  loading: PropTypes.bool.isRequired,
+  loading: PropTypes.bool,
   disabled: PropTypes.bool,
 };
 

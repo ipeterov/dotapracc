@@ -68,6 +68,11 @@ class SteamUser(AbstractBaseUser, PermissionsMixin):
         as_str = str(self.steamid)
         return int(as_str[3:]) - 61197960265728
 
+    def get_referral_registers(self):
+        refs = self.referral_codes.all()
+        register_counts = [ref.responses.filter(action='REGISTER').count() for ref in refs]
+        return sum(register_counts)
+
     def get_short_name(self):
         return self.personaname
 

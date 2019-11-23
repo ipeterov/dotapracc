@@ -1,4 +1,6 @@
 import graphene
+from django.contrib.auth.models import AnonymousUser
+from django.urls import reverse
 from graphene_django.types import DjangoObjectType
 
 from authentication.models import SteamUser
@@ -31,10 +33,22 @@ class UserType(DjangoObjectType):
         model = SteamUser
 
     selected_heroes = graphene.List(SelectedHeroType)
+    referral_registers = graphene.Int()
+    referral_url = graphene.String()
 
     @staticmethod
-    def resolve_selected_heroes(root, info, **kwargs):
-        return root.selected_heroes.select_related(
+    def resolve_referral_url(obj, *args, **kwargs):
+        ref = obj.referral_codes.first()
+        if ref is not None:
+            return ref.url
+
+    @staticmethod
+    def resolve_referral_registers(obj, *args, **kwargs):
+        return obj.get_referral_registers()
+
+    @staticmethod
+    def resolve_selected_heroes(obj, *args, **kwargs):
+        return obj.selected_heroes.select_related(
             'user',
             'hero',
         ).prefetch_related(
@@ -51,6 +65,7 @@ class UpdateOrCreateSelectedHero(graphene.Mutation):
 
     selected_hero = graphene.Field(SelectedHeroType)
 
+    @staticmethod
     def mutate(root, info, hero_id, matchup_ids=None, is_switched_on=None):
         defaults = {}
 
@@ -82,6 +97,7 @@ class DeleteSelectedHero(graphene.Mutation):
 
     ok = graphene.Boolean()
 
+    @staticmethod
     def mutate(root, info, selected_hero_id):
         selected_hero = SelectedHero.objects.get(pk=selected_hero_id)
 
@@ -98,6 +114,7 @@ class ToggleSelectedHeroes(graphene.Mutation):
 
     ok = graphene.Boolean()
 
+    @staticmethod
     def mutate(root, info, toggle_to):
         user = info.context.user
         user.selected_heroes.update(is_switched_on=toggle_to)
@@ -110,6 +127,7 @@ class UpdateViewerProfile(graphene.Mutation):
 
     viewer = graphene.Field(UserType)
 
+    @staticmethod
     def mutate(root, info, profile_text=None):
         user = info.context.user
 
@@ -120,26 +138,68 @@ class UpdateViewerProfile(graphene.Mutation):
         return UpdateViewerProfile(viewer=user)
 
 
+class CreateReferralLink(graphene.Mutation):
+    class Arguments:
+        code = graphene.String()
+
+    url = graphene.String()
+    error = graphene.String()
+
+    @staticmethod
+    def mutate(root, info, code):
+        user = info.context.user
+
+        if user == AnonymousUser():
+            return CreateReferralLink(error='You have to be logged in to create a referral link')
+
+        if user.referral_codes.count() != 0:
+            return CreateReferralLink(error='You can\'t add more than one referral link')
+
+        referral = user.referral_codes.create(
+            code=code,
+            label=code,
+            redirect_to=reverse('index'),
+        )
+
+        return CreateReferralLink(url=referral.url)
+
+
 class Mutations(graphene.ObjectType):
     update_or_create_selected_hero = UpdateOrCreateSelectedHero.Field()
     delete_selected_hero = DeleteSelectedHero.Field()
     toggle_selected_heroes = ToggleSelectedHeroes.Field()
     update_viewer_profile = UpdateViewerProfile.Field()
+    create_referral_link = CreateReferralLink.Field()
 
 
 class Query(graphene.ObjectType):
     viewer = graphene.Field(UserType)
     all_heroes = graphene.List(HeroType)
     midlaners = graphene.List(HeroType)
+    referrers = graphene.List(UserType)
 
-    def resolve_viewer(self, info, **kwargs):
+    @staticmethod
+    def resolve_viewer(root, info, **kwargs):
         user = info.context.user
         if user.is_anonymous:
             return None
         return user
 
-    def resolve_all_heroes(self, info, **kwargs):
+    @staticmethod
+    def resolve_all_heroes(*args, **kwargs):
         return Hero.objects.all()
 
-    def resolve_midlaners(self, info, **kwargs):
+    @staticmethod
+    def resolve_midlaners(*args, **kwargs):
         return Hero.objects.lane_occupants('mid')
+
+    @staticmethod
+    def resolve_referrers(*args, **kwargs):
+        referrers = []
+        for user in SteamUser.objects.all():
+            user.referral_registers = user.get_referral_registers()
+            if user.referral_registers != 0:
+                referrers.append(user)
+
+        referrers.sort(key=lambda u: u.referral_registers, reverse=True)
+        return referrers
