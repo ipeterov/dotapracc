@@ -181,11 +181,12 @@ class PlayerSearchManager(models.Manager):
 
     @staticmethod
     def cancel(search):
+        match = search.match
         search.cancel()
         search.save()
-        if search.match:
-            search.match.back_to_search()
-            search.match.save()
+        if match:
+            match.back_to_search()
+            match.save()
 
     @staticmethod
     def update_channel(search, channel_name):
@@ -335,11 +336,12 @@ class PlayerSearch(models.Model):
 
     @transition(state, (SEARCHING, FOUND_MATCH, LOBBY_SETUP, IN_LOBBY), CANCELLED)
     def cancel(self):
+        self.match = None
         self.ended_at = now()
 
     @transition(state, (FOUND_MATCH, ACCEPTED_MATCH, LOBBY_SETUP, IN_LOBBY), SEARCHING)
     def back_to_search(self):
-        pass
+        self.match = None
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
