@@ -34,7 +34,13 @@ class UserType(DjangoObjectType):
 
     @staticmethod
     def resolve_selected_heroes(root, info, **kwargs):
-        return root.selected_heroes.order_by('-id')
+        return root.selected_heroes.select_related(
+            'user',
+            'hero',
+        ).prefetch_related(
+            'matchups',
+            'hero__pro_matchups',
+        ).order_by('-id')
 
 
 class UpdateOrCreateSelectedHero(graphene.Mutation):
