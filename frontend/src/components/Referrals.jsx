@@ -5,9 +5,22 @@ import gql from 'graphql-tag';
 import { graphql } from '@apollo/react-hoc';
 import { useQuery } from '@apollo/react-hooks';
 import {
-  Table, TableHead, TableBody, TableRow, TableCell, CircularProgress, Link,
-  TextField, Typography, Dialog, DialogTitle, DialogContent,
-  DialogContentText, DialogActions,
+  Avatar,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Grid,
+  Link,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  TextField,
+  Typography,
 } from '@material-ui/core';
 
 import MyButton from './MyButton';
@@ -21,6 +34,7 @@ const QUERY = gql`
     }
     referrers {
       id
+      avatarmedium
       personaname
       referralRegisters
       referralUrl
@@ -94,7 +108,7 @@ function Referrals({ mutate }) {
         <TableHead>
           <TableRow>
             <TableCell>
-              Referrer name
+              Referrer
             </TableCell>
             <TableCell>
               Link
@@ -108,7 +122,21 @@ function Referrals({ mutate }) {
           {_.map(data.referrers, (item) => (
             <TableRow key={item.id}>
               <TableCell>
-                {item.personaname}
+                <Grid
+                  container
+                  alignItems="center"
+                  spacing={1}
+                >
+                  <Grid item>
+                    <Avatar
+                      alt={item.personaname}
+                      src={item.avatarmedium}
+                    />
+                  </Grid>
+                  <Grid item>
+                    {item.personaname}
+                  </Grid>
+                </Grid>
               </TableCell>
               <TableCell>
                 {renderUrl(item.referralUrl)}
