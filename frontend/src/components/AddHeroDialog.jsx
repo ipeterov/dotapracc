@@ -6,6 +6,7 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
+  Fab,
   FormControl,
   InputLabel,
   MenuItem,
@@ -28,6 +29,18 @@ export default function AddHeroDialog({ allHeroes, handleAdd, disabled }) {
 
   return (
     <div>
+      <Fab
+        color="secondary"
+        onClick={handleClickOpen}
+        style={{
+          right: '20px',
+          bottom: '20px',
+          position: 'fixed',
+          zIndex: 1500,
+        }}
+      >
+        <AddIcon />
+      </Fab>
       <Button
         variant="contained"
         color="primary"
