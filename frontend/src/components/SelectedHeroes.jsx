@@ -62,13 +62,14 @@ class SelectedHeroes extends React.Component {
 
   handleAdd(heroId) {
     this.setState({ adding: true },
-      (prevState) => {
+      () => {
         this.props.updateOrCreate({
           variables: { heroId },
           refetchQueries: [{ query: QUERY }],
           awaitRefetchQueries: true,
         }).then(() => {
-          const added = [heroId].concat(prevState.added);
+          // eslint-disable-next-line react/no-access-state-in-setstate
+          const added = [heroId].concat(this.state.added);
           this.setState({ adding: false, added });
         });
       });
@@ -145,7 +146,7 @@ class SelectedHeroes extends React.Component {
   }
 
   static renderSkeletons() {
-    return _.times(1, (i) => (
+    return _.times(2, (i) => (
       <Grid key={i} item style={{ width: '100%' }}>
         <Skeleton variant="rect" height={188.5} />
       </Grid>
