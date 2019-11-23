@@ -189,14 +189,23 @@ class SelectedHero extends React.Component {
           />
 
           <CardContent>
-            <Grid container justify="space-between">
-              {this.state.matchupsExpanded && (
-                <Grid item>
+            <Grid
+              container
+              justify="space-between"
+              alignItems="center"
+            >
+              <Grid item>
+                {this.state.matchupsExpanded ? (
                   <Typography variant="overline">
                     Will match with:
                   </Typography>
-                </Grid>
-              )}
+                ) : (
+                  <Typography variant="overline">
+                    {matchups.length} matchups configured
+                  </Typography>
+                )}
+              </Grid>
+
               <Grid item>
                 <Button
                   onClick={() => this.setState((prevState) => (
