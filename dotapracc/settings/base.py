@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'channels',
     'graphene_django',
     'social_django',
+    'imagekit',
     'authentication',
     'core',
     'frontend',

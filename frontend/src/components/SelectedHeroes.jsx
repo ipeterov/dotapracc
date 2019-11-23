@@ -27,7 +27,7 @@ const QUERY = gql`
     allHeroes {
       id
       name
-      picture
+      pictureThumbnail
       primaryAttribute
     }
     midlaners { id }

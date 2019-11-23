@@ -156,8 +156,7 @@ class SelectedHero extends React.Component {
           <CardHeader
             avatar={(
               <Avatar
-                /* eslint-disable-next-line no-undef */
-                src={MEDIA_PREFIX + selectedHero.hero.picture}
+                src={selectedHero.hero.picture}
                 style={{
                   width: '80px',
                   height: '80px',
@@ -222,14 +221,13 @@ class SelectedHero extends React.Component {
                 >
                   {heroesByAttr[attribute].map((hero) => (
                     <GridListTile
-                      key={hero.picture}
+                      key={hero.id}
                       onMouseDown={this.toggleHeroes([hero.id])}
                       onMouseEnter={() => this.setState({ highlightedHeroId: hero.id })}
                       onMouseLeave={() => this.setState({ highlightedHeroId: null })}
                     >
                       <img
-                        /* eslint-disable-next-line no-undef */
-                        src={MEDIA_PREFIX + hero.picture}
+                        src={hero.pictureThumbnail}
                         alt={hero.name}
                         style={this.getGreyscaleStyle(hero.id, matchups)}
                       />

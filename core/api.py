@@ -9,6 +9,17 @@ class HeroType(DjangoObjectType):
     class Meta:
         model = Hero
 
+    picture = graphene.String()
+    picture_thumbnail = graphene.String()
+
+    @staticmethod
+    def resolve_picture(root, info):
+        return root.picture.url
+
+    @staticmethod
+    def resolve_picture_thumbnail(root, info):
+        return root.picture_thumbnail.url
+
 
 class SelectedHeroType(DjangoObjectType):
     class Meta:

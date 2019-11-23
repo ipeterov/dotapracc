@@ -9,6 +9,8 @@ from django.conf import settings
 from django.db import models, transaction
 from django.utils.timezone import now
 from django_fsm import FSMField, transition
+from imagekit.models import ImageSpecField
+from imagekit.processors import ResizeToFill
 
 from authentication.models import SteamUser
 from .tasks import invite_players
@@ -35,6 +37,11 @@ class Hero(models.Model):
 
     name = models.CharField(max_length=64)
     picture = models.ImageField(upload_to='hero_images')
+    picture_thumbnail = ImageSpecField(
+        source='picture',
+        processors=[ResizeToFill(78, 44)],
+        format='WebP',
+    )
     opendota_id = models.IntegerField(unique=True)
 
     primary_attribute = models.CharField(
