@@ -3,6 +3,7 @@ import random
 import time
 from collections import defaultdict
 
+import networkx as nx
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.conf import settings
@@ -120,17 +121,29 @@ class PlayerSearchManager(models.Manager):
     @transaction.atomic
     def find_matches(self):
         searching = self.filter(state=self.model.SEARCHING)
+
+        G = nx.Graph()
         for search in searching:
+            G.add_node(search)
             for other in searching:
                 if search == other:
                     continue
 
-                # State can change in this loop
-                if search.state == other.state != self.model.SEARCHING:
-                    continue
+                G.add_node(other)
 
                 if search.can_match_with(other):
-                    self.suggest_match(search, other)
+                    score = search.weighing_function(other)
+
+                    # Doesn't make sense to instantly match people with MMR difference > 1500
+                    if score > 1500:
+                        continue
+
+                    # 1 / score because there is only max_weight_matching and no min version
+                    G.add_edge(search, other, weight=1 / score)
+
+        matches = nx.max_weight_matching(G)
+        for search, other in matches:
+            self.suggest_match(search, other)
 
     def active(self):
         return self.filter(state__in=self.model.ACTIVE_STATES)
@@ -309,6 +322,18 @@ class PlayerSearch(models.Model):
         if not self.hero_pairs(other):
             return False
         return True
+
+    def weighing_function(self, other):
+        mmr_diff = abs(self.user.mmr_estimate - other.user.mmr_estimate)
+        total_wait = ((now() - self.started_at) + (now() - other.started_at)).total_seconds() / 60
+
+        # For each minute of waiting MMR difference is decreased by 50
+        score = mmr_diff - total_wait * 50
+
+        if score <= 0:
+            score = 1
+
+        return score
 
     @transition(state, SEARCHING, FOUND_MATCH)
     def suggest_match(self, match):
