@@ -16,7 +16,7 @@ def get_stats(days=7):
     return {
         f'Active players (over {days}d)': calculate_active_players(days),
         'Searching now': calculate_searching_now(),
-        f'Average queue time (over {days}d)': calculate_average_queue_time(days),
+        f'Minutes since last match': calculate_most_recent_match(),
     }
 
 
@@ -54,3 +54,10 @@ def calculate_average_queue_time(days):
     in_seconds = [td.total_seconds() for td in durations if td is not None]
     raw = int(sum(in_seconds) / len(in_seconds))
     return f'{raw}s'
+
+
+def calculate_most_recent_match():
+    latest_success = PlayerSearch.objects.filter(state=PlayerSearch.SUCCESS
+                                                ).latest('ended_at').ended_at
+    minutes_passed = int((now() - latest_success).total_seconds() / 60)
+    return f'{minutes_passed}'
