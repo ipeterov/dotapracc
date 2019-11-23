@@ -54,13 +54,12 @@ export default function AddHeroDialog({ allHeroes, handleAdd, disabled }) {
         <Dialog open={open} onClose={handleClose}>
           <DialogContent>
             <DialogContentText>
-              Add a hero to your matching profile. You will only get matches
-              with people who want to play against your heroes.
+              Select a hero to add to your matching profile. You will only get
+              matches with people who want to play against your heroes.
             </DialogContentText>
             <FormControl>
               <InputLabel>Hero</InputLabel>
               <Select
-                autoFocus
                 style={{ width: '200px' }}
                 value={heroId}
                 onChange={({ target }) => { setHeroId(target.value); }}
