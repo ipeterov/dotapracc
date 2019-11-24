@@ -9,7 +9,6 @@ import {
   Button,
   CircularProgress,
   Grid,
-  Tooltip,
   Typography,
 } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
@@ -194,28 +193,20 @@ class SelectedHeroes extends React.Component {
             {!zeroHeroesSelected && (
               <>
                 <Grid item>
-                  <Tooltip title="Switch heroes back on">
-                    <div>
-                      <Button
-                        onClick={() => this.handleToggleSelectedHeroes(true)}
-                        disabled={loading}
-                      >
-                        Switch all heroes on
-                      </Button>
-                    </div>
-                  </Tooltip>
+                  <Button
+                    onClick={() => this.handleToggleSelectedHeroes(true)}
+                    disabled={loading}
+                  >
+                    Switch all heroes on
+                  </Button>
                 </Grid>
                 <Grid item>
-                  <Tooltip title="Switch heroes off to temporarily disable them">
-                    <div>
-                      <Button
-                        onClick={() => this.handleToggleSelectedHeroes(false)}
-                        disabled={loading}
-                      >
-                        Switch all heroes off
-                      </Button>
-                    </div>
-                  </Tooltip>
+                  <Button
+                    onClick={() => this.handleToggleSelectedHeroes(false)}
+                    disabled={loading}
+                  >
+                    Switch all heroes off
+                  </Button>
                 </Grid>
               </>
             )}
