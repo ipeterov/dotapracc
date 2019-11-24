@@ -4,7 +4,7 @@ import { Grid, Typography } from '@material-ui/core';
 
 export default function About() {
   return (
-    <Grid container direction="column" spacing={1}>
+    <Grid container direction="column" spacing={2}>
       <Grid item>
         <Typography variant="h5">What is dotapra.cc?</Typography>
         <Typography>

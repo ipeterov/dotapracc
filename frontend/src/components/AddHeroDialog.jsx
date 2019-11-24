@@ -6,8 +6,8 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  Fab,
   FormControl,
+  FormHelperText,
   InputLabel,
   MenuItem,
   Select,
@@ -15,9 +15,14 @@ import {
 import AddIcon from '@material-ui/icons/Add';
 
 
-export default function AddHeroDialog({ allHeroes, handleAdd, disabled }) {
+export default function AddHeroDialog(props) {
+  const {
+    allHeroes, handleAdd, disabled, zeroHeroesSelected,
+  } = props;
+
   const [open, setOpen] = React.useState(false);
   const [heroId, setHeroId] = React.useState('');
+  const btn = React.useRef(null);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -27,23 +32,21 @@ export default function AddHeroDialog({ allHeroes, handleAdd, disabled }) {
     setOpen(false);
   };
 
+  const focusAddHeroButton = () => {
+    const timeout = setTimeout(() => {
+      btn.current.focus();
+    }, 100);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  };
+
   return (
     <div>
-      <Fab
-        color="secondary"
-        onClick={handleClickOpen}
-        style={{
-          right: '20px',
-          bottom: '20px',
-          position: 'fixed',
-          zIndex: 1500,
-        }}
-      >
-        <AddIcon />
-      </Fab>
       <Button
         variant="contained"
-        color="primary"
+        color={zeroHeroesSelected ? 'secondary' : 'primary'}
         onClick={handleClickOpen}
         disabled={disabled}
       >
@@ -54,20 +57,24 @@ export default function AddHeroDialog({ allHeroes, handleAdd, disabled }) {
         <Dialog open={open} onClose={handleClose}>
           <DialogContent>
             <DialogContentText>
-              Select a hero to add to your matching profile. You will only get
-              matches with people who want to play against your heroes.
+              Select a hero to train. You will only get matches with people
+              who want to play against your selected heroes.
             </DialogContentText>
             <FormControl>
               <InputLabel>Hero</InputLabel>
               <Select
-                style={{ width: '200px' }}
+                style={{ width: '250px' }}
                 value={heroId}
-                onChange={({ target }) => { setHeroId(target.value); }}
+                onChange={({ target }) => {
+                  setHeroId(target.value);
+                  focusAddHeroButton();
+                }}
               >
                 {allHeroes.map((hero) => (
                   <MenuItem key={hero.id} value={hero.id}>{hero.name}</MenuItem>
                 ))}
               </Select>
+              <FormHelperText>Try typing hero names when select is open</FormHelperText>
             </FormControl>
           </DialogContent>
           <DialogActions>
@@ -75,7 +82,12 @@ export default function AddHeroDialog({ allHeroes, handleAdd, disabled }) {
               Cancel
             </Button>
             <Button
-              onClick={() => { handleClose(); handleAdd(heroId); }}
+              ref={btn}
+              onClick={() => {
+                handleClose();
+                handleAdd(heroId);
+                setHeroId('');
+              }}
               color="primary"
             >
               Add hero
@@ -88,6 +100,7 @@ export default function AddHeroDialog({ allHeroes, handleAdd, disabled }) {
 }
 
 AddHeroDialog.propTypes = {
+  zeroHeroesSelected: PropTypes.bool.isRequired,
   handleAdd: PropTypes.func.isRequired,
   disabled: PropTypes.bool.isRequired,
   allHeroes: PropTypes.array.isRequired,

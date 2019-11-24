@@ -167,13 +167,16 @@ class SelectedHero extends React.Component {
               />
             )}
             action={(
-              <div>
-                <Switch
-                  checked={selectedHero.isSwitchedOn}
-                  onChange={(event) => {
-                    this.update({ isSwitchedOn: event.target.checked });
-                  }}
-                />
+              <>
+                <Tooltip title="Switch heroes off to temporarily disable them">
+                  <Switch
+                    color="primary"
+                    checked={selectedHero.isSwitchedOn}
+                    onChange={(event) => {
+                      this.update({ isSwitchedOn: event.target.checked });
+                    }}
+                  />
+                </Tooltip>
                 <IconButton onClick={
                   () => this.props.handleDelete(selectedHero.id)
                 }
@@ -182,7 +185,7 @@ class SelectedHero extends React.Component {
                     <CircularProgress size={24} /> : <CloseIcon />
                   }
                 </IconButton>
-              </div>
+              </>
             )}
             title={name}
             titleTypographyProps={{ variant: 'h5' }}

@@ -6,7 +6,11 @@ import { graphql } from '@apollo/react-hoc';
 import { compose } from 'recompose';
 import gql from 'graphql-tag';
 import {
-  Button, CircularProgress, Grid, Typography,
+  Button,
+  CircularProgress,
+  Grid,
+  Tooltip,
+  Typography,
 } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
 
@@ -78,7 +82,7 @@ class SelectedHeroes extends React.Component {
   handleDelete(selectedHeroId) {
     this.setState(
       (prevState) => ({ deleting: prevState.deleting.concat([selectedHeroId]) }),
-      (prevState) => {
+      () => {
         this.props.delete({
           variables: {
             selectedHeroId,
@@ -88,7 +92,8 @@ class SelectedHeroes extends React.Component {
           ],
         }).then(() => {
           const newDeleting = _.filter(
-            prevState.deleting,
+            // eslint-disable-next-line react/no-access-state-in-setstate
+            this.state.deleting,
             (id) => id !== selectedHeroId,
           );
           this.setState({ deleting: newDeleting });
@@ -146,7 +151,7 @@ class SelectedHeroes extends React.Component {
   }
 
   static renderSkeletons() {
-    return _.times(2, (i) => (
+    return _.times(3, (i) => (
       <Grid key={i} item style={{ width: '100%' }}>
         <Skeleton variant="rect" height={180.5} />
       </Grid>
@@ -157,12 +162,19 @@ class SelectedHeroes extends React.Component {
     const { data } = this.props;
     const { loading, error } = data;
 
+    let zeroHeroesSelected;
+    if (loading || !data.viewer) {
+      zeroHeroesSelected = false;
+    } else {
+      zeroHeroesSelected = data.viewer.selectedHeroes.length === 0;
+    }
+
     if (error) return <p>Error :(</p>;
 
     if (!loading && data.viewer == null) {
       return (
         <Typography>
-        Log in to be able to train heroes.
+          Sign in through Steam to be able to train heroes.
         </Typography>
       );
     }
@@ -173,27 +185,40 @@ class SelectedHeroes extends React.Component {
           <Grid container spacing={2}>
             <Grid item>
               <AddHeroDialog
+                zeroHeroesSelected={zeroHeroesSelected}
                 disabled={loading}
                 handleAdd={this.handleAdd}
                 allHeroes={data.allHeroes || []}
               />
             </Grid>
-            <Grid item>
-              <Button
-                onClick={() => this.handleToggleSelectedHeroes(true)}
-                disabled={loading}
-              >
-                Switch all heroes on
-              </Button>
-            </Grid>
-            <Grid item>
-              <Button
-                onClick={() => this.handleToggleSelectedHeroes(false)}
-                disabled={loading}
-              >
-                Switch all heroes off
-              </Button>
-            </Grid>
+            {!zeroHeroesSelected && (
+              <>
+                <Grid item>
+                  <Tooltip title="Switch heroes back on">
+                    <div>
+                      <Button
+                        onClick={() => this.handleToggleSelectedHeroes(true)}
+                        disabled={loading}
+                      >
+                        Switch all heroes on
+                      </Button>
+                    </div>
+                  </Tooltip>
+                </Grid>
+                <Grid item>
+                  <Tooltip title="Switch heroes off to temporarily disable them">
+                    <div>
+                      <Button
+                        onClick={() => this.handleToggleSelectedHeroes(false)}
+                        disabled={loading}
+                      >
+                        Switch all heroes off
+                      </Button>
+                    </div>
+                  </Tooltip>
+                </Grid>
+              </>
+            )}
           </Grid>
         </Grid>
         <Grid item>

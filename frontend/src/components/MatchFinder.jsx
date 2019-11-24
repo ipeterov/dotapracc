@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import ReactTimeAgo from 'react-time-ago';
 import autoBind from 'react-autobind';
 import { w3cwebsocket as W3CWebSocket } from 'websocket';
@@ -114,7 +115,7 @@ export default class MatchFinder extends React.Component {
         variant="contained"
         color="secondary"
         loading={this.state.waitingForResponse}
-        disabled={!this.state.connected}
+        disabled={!this.state.connected || this.props.zeroHeroesSelected}
       >
         Find match
       </MyButton>
@@ -165,7 +166,7 @@ export default class MatchFinder extends React.Component {
   }
 
   renderFoundMatchDialog() {
-    const source = '/static/frontend/match_found.mp3';
+    const source = '/static/frontend/match_found.ogg';
     const options = {
       body: `Opponent: ${this.state.opponent.personaName}`,
       audio: source,
@@ -204,7 +205,7 @@ export default class MatchFinder extends React.Component {
         />
         {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
         <audio id="sound" preload="auto" loop>
-          <source src={source} type="audio/mpeg" />
+          <source src={source} type="audio/ogg" />
           <embed hidden loop autostart="false" src={source} />
         </audio>
       </>
@@ -309,3 +310,7 @@ export default class MatchFinder extends React.Component {
     return this.renderSearchButton();
   }
 }
+
+MatchFinder.propTypes = {
+  zeroHeroesSelected: PropTypes.bool.isRequired,
+};

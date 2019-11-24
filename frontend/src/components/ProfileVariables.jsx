@@ -65,7 +65,7 @@ class ProfileVariables extends React.Component {
     if (!loading && data.viewer == null) {
       return (
         <Typography>
-          Log in to be able to configure your profile.
+          Sign in through Steam to be able to configure your profile.
         </Typography>
       );
     }

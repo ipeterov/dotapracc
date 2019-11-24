@@ -81,13 +81,19 @@ function Referrals({ mutate }) {
   };
 
   const renderUsersLink = (viewer) => {
+    if (!viewer) {
+      return (
+        <Typography>
+          Sign in through Steam to get your own referral link
+        </Typography>
+      );
+    }
+
     if (viewer.referralUrl) {
       return (
-        <>
-          <Typography>
-            Here's your referral link: {renderUrl(viewer.referralUrl)}
-          </Typography>
-        </>
+        <Typography>
+          Here's your referral link: {renderUrl(viewer.referralUrl)}
+        </Typography>
       );
     }
 
