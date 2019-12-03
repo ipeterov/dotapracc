@@ -30,6 +30,7 @@ class BotAccountAdmin(admin.ModelAdmin):
     model = BotAccount
     list_display = (
         'login',
+        'is_main',
         'is_busy',
     )
 

@@ -83,3 +83,44 @@ class SteamUser(AbstractBaseUser, PermissionsMixin):
         api = OpenDotaAPI()
         info = api.get_profile_info(self.steam32id)
         self.mmr_estimate = info.get('mmr_estimate', {}).get('estimate')
+
+    def hero_pairs(self, other):
+        self_heroes = self.selected_heroes.active().as_dict()
+        other_reverse = other.selected_heroes.active().as_reverse_dict()
+
+        pairs = []
+        for hero, matchups in self_heroes.items():
+            for matchup in matchups:
+                if matchup in other_reverse[hero]:
+                    pairs.append((hero, matchup))
+
+        return pairs
+
+    def matching_score(self, other, total_wait=0):
+        if self == other:
+            return False, None
+
+        if not self.mmr_estimate or not other.mmr_estimate:
+            return False, None
+
+        if not self.hero_pairs(other):
+            return False, None
+
+        mmr_diff = abs(self.mmr_estimate - other.mmr_estimate)
+
+        # For each minute of waiting MMR difference is decreased by 50
+        score = mmr_diff - total_wait * 50
+        if score <= 0:
+            score = 1
+
+        # Doesn't make sense to instantly match people with MMR difference > 1500
+        if score > 1500:
+            return False, score
+
+        return True, score
+
+    def possible_matches(self):
+        for other in SteamUser.objects.all():
+            can_match, _ = self.matching_score(other)
+            if can_match:
+                yield other

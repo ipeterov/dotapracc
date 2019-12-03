@@ -5,6 +5,8 @@ from secrets import token_hex
 import gevent
 from dota2 import Dota2Client
 from steam import SteamClient
+from steam.enums import EResult
+from steam.enums.emsg import EMsg
 
 
 @contextmanager
@@ -95,3 +97,38 @@ def invite(steam_ids, bot_account, lobby_name):
         else:
             assert len(args) == 2
             yield args
+
+
+def send_friend_request(steam_id, bot_account):
+    client = SteamClient()
+    steam_id = int(steam_id)
+
+    @client.on('connected')
+    def log_in():
+        client.login(username=bot_account.login, password=bot_account.password)
+
+    @client.friends.on('ready')
+    def send_request():
+        client.friends.add(steam_id)
+
+    connect_with_retry(client)
+    eresult, steam_id = client.friends.wait_event(client.friends.EVENT_FRIEND_ADD_RESULT)
+    return eresult == EResult.OK, eresult
+
+
+def send_chat_message(steam_id, bot_account, message):
+    client = SteamClient()
+    steam_id = int(steam_id)
+
+    @client.on('connected')
+    def log_in():
+        client.login(username=bot_account.login, password=bot_account.password)
+
+    @client.on('logged_on')
+    def send_message():
+        recipient = client.get_user(steam_id, fetch_persona_state=False)
+        recipient.send_message(message)
+        client.emit('cycle_finished')
+
+    connect_with_retry(client)
+    client.wait_event('cycle_finished')

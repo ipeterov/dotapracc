@@ -14,7 +14,7 @@ from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
 
 from authentication.models import SteamUser
-from .tasks import invite_players
+from .tasks import invite_players, notify_possible_matches
 
 
 class HeroQuerySet(models.QuerySet):
@@ -126,18 +126,10 @@ class PlayerSearchManager(models.Manager):
         for search in searching:
             G.add_node(search)
             for other in searching:
-                if search == other:
-                    continue
-
                 G.add_node(other)
 
-                if search.can_match_with(other):
-                    score = search.weighing_function(other)
-
-                    # Doesn't make sense to instantly match people with MMR difference > 1500
-                    if score > 1500:
-                        continue
-
+                can_match, score = search.matching_score(other)
+                if can_match:
                     # 1 / score because there is only max_weight_matching and no min version
                     G.add_edge(search, other, weight=1 / score)
 
@@ -284,7 +276,7 @@ class PlayerSearch(models.Model):
         return {
             'state': self.state,
             'startedAt': self.started_at and self.started_at.isoformat(),
-            'heroPairs': match and self.hero_pairs(match),
+            'heroPairs': match and self.user.hero_pairs(match.user),
             'opponent': {
                 'id': match.user.steam32id,
                 'personaName': match.user.personaname,
@@ -306,34 +298,10 @@ class PlayerSearch(models.Model):
             },
         )
 
-    def hero_pairs(self, other):
-        self_heroes = self.user.selected_heroes.active().as_dict()
-        other_reverse = other.user.selected_heroes.active().as_reverse_dict()
-
-        pairs = []
-        for hero, matchups in self_heroes.items():
-            for matchup in matchups:
-                if matchup in other_reverse[hero]:
-                    pairs.append((hero, matchup))
-
-        return pairs
-
-    def can_match_with(self, other):
-        if not self.hero_pairs(other):
-            return False
-        return True
-
-    def weighing_function(self, other):
-        mmr_diff = abs(self.user.mmr_estimate - other.user.mmr_estimate)
-        total_wait = ((now() - self.started_at) + (now() - other.started_at)).total_seconds() / 60
-
-        # For each minute of waiting MMR difference is decreased by 50
-        score = mmr_diff - total_wait * 50
-
-        if score <= 0:
-            score = 1
-
-        return score
+    def matching_score(self, other):
+        wait_td = (now() - self.started_at) + (now() - other.started_at)
+        total_wait = wait_td.total_seconds() / 60
+        return self.user.matching_score(other.user, total_wait=total_wait)
 
     @transition(state, SEARCHING, FOUND_MATCH)
     def suggest_match(self, match):
@@ -369,27 +337,44 @@ class PlayerSearch(models.Model):
         self.match = None
 
     def save(self, *args, **kwargs):
+        created = False
+        if self.pk is None:
+            created = True
+
         super().save(*args, **kwargs)
+
+        # if created:
+        #     notify_possible_matches.delay(self.id)
+
         self.push_to_websocket()
 
 
 class BotAccountManager(models.Manager):
-    def free_bot(self):
+    def suitable_bot(self, **kwargs):
         while True:
-            free = list(self.filter(is_busy=False))
-
-            if not free:
-                time.sleep(1)
+            suitable = list(self.filter(**kwargs))
+            if not suitable:
+                time.sleep(2)
             else:
-                return random.choice(free)
+                return random.choice(suitable)
 
 
 class BotAccount(models.Model):
     login = models.CharField(max_length=64)
     password = models.CharField(max_length=128)
-    is_busy = models.BooleanField()
+    is_busy = models.BooleanField(default=False)
+    is_main = models.BooleanField(default=False)
 
     objects = BotAccountManager()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['is_main'],
+                condition=models.Q(is_main=True),
+                name='only_one_main_bot',
+            ),
+        ]
 
     def __str__(self):
         return self.login
