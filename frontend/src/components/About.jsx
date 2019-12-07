@@ -4,6 +4,7 @@ import {
   Card,
   CardContent,
   CardHeader,
+  Divider,
   Grid,
   Typography,
 } from '@material-ui/core';
@@ -14,13 +15,14 @@ export default function About() {
     <Grid
       container
       direction="column"
-      spacing={5}
+      spacing={6}
     >
       <Grid
         item
         container
         spacing={1}
         direction="column"
+        // style={{ marginTop: 100 }}
       >
         <Grid item>
           <Typography variant="h2" style={{ whiteSpace: 'pre-line' }}>
@@ -46,6 +48,7 @@ export default function About() {
           </Button>
         </Grid>
       </Grid>
+      <Divider />
       <Grid
         item
         container

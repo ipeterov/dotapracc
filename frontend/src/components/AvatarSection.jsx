@@ -18,6 +18,7 @@ import SteamSignIn from './SteamSignIn';
 const QUERY = gql`
   { 
     viewer {
+      __typename
       id
       personaname
       avatarmedium

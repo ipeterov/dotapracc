@@ -2,8 +2,7 @@ import React from 'react';
 import gql from 'graphql-tag';
 import { useQuery } from '@apollo/react-hooks';
 import {
-  CircularProgress,
-  Grid,
+  LinearProgress,
   Step,
   StepContent,
   StepLabel,
@@ -16,8 +15,15 @@ import SelectedHeroes from './SelectedHeroes';
 
 
 const QUERY = gql`
-  query Referrals { 
-    viewer { id botInFriends }
+  { 
+    viewer {
+      __typename
+      id
+      personaname
+      avatarmedium
+      botInFriends
+      selectedHeroes { id }
+    }
   }
 `;
 
@@ -26,7 +32,7 @@ export default function Wizard() {
 
   const [step, setStep] = React.useState(null);
 
-  if (loading || !!error) return <CircularProgress />;
+  if (loading || !!error) return <LinearProgress />;
 
   if (step === null) {
     const signedIn = !!data.viewer;
@@ -63,15 +69,7 @@ export default function Wizard() {
         <Step>
           <StepLabel>Add a few heroes to practice</StepLabel>
           <StepContent>
-            <Grid
-              container
-              direction="column"
-              spacing={2}
-            >
-              <Grid item>
-                <SelectedHeroes showProfileLink />
-              </Grid>
-            </Grid>
+            <SelectedHeroes showProfileLink />
           </StepContent>
         </Step>
       </Stepper>
