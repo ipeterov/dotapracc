@@ -3,11 +3,11 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { Container } from '@material-ui/core';
 
 import About from './About';
-import Referrals from './Referrals';
-import Profile from './Profile';
-import MyAppBar from './MyAppBar';
-import Stats from './Stats';
 import Footer from './Footer';
+import MyAppBar from './MyAppBar';
+import Profile from './Profile';
+import Referrals from './Referrals';
+import Wizard from './Wizard';
 
 
 export default function Base() {
@@ -22,13 +22,15 @@ export default function Base() {
           minHeight: 'calc(100vh - 116px)',
         }}
       >
-        <Stats />
         <Switch>
           <Route path="/refs/">
             <Referrals />
           </Route>
           <Route path="/about/">
             <About />
+          </Route>
+          <Route path="/wizard/">
+            <Wizard />
           </Route>
           <Route path="/">
             <Profile />

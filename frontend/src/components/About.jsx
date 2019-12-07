@@ -1,10 +1,20 @@
 import React from 'react';
-import { Grid, Typography } from '@material-ui/core';
+import { Button, Grid, Typography } from '@material-ui/core';
 
 
 export default function About() {
   return (
     <Grid container direction="column" spacing={2}>
+      <Grid item>
+        <Button
+          variant="contained"
+          color="secondary"
+          href="/wizard"
+        >
+          Start practicing
+        </Button>
+      </Grid>
+
       <Grid item>
         <Typography variant="h5">What is dotapra.cc?</Typography>
         <Typography>

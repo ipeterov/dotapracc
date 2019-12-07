@@ -4,7 +4,8 @@ from django.urls import reverse
 from graphene_django.types import DjangoObjectType
 
 from authentication.models import SteamUser
-from .models import SelectedHero, Hero
+from .dota_bot import wait_for_friend_request_answer, send_friend_request
+from .models import BotAccount, SelectedHero, Hero
 
 
 class HeroType(DjangoObjectType):
@@ -15,12 +16,12 @@ class HeroType(DjangoObjectType):
     picture_thumbnail = graphene.String()
 
     @staticmethod
-    def resolve_picture(root, info):
-        return root.picture.url
+    def resolve_picture(obj, info):
+        return obj.picture.url
 
     @staticmethod
-    def resolve_picture_thumbnail(root, info):
-        return root.picture_thumbnail.url
+    def resolve_picture_thumbnail(obj, info):
+        return obj.picture_thumbnail.url
 
 
 class SelectedHeroType(DjangoObjectType):
@@ -35,19 +36,20 @@ class UserType(DjangoObjectType):
     selected_heroes = graphene.List(SelectedHeroType)
     referral_registers = graphene.Int()
     referral_url = graphene.String()
+    bot_in_friends = graphene.Boolean()
 
     @staticmethod
-    def resolve_referral_url(obj, *args, **kwargs):
+    def resolve_referral_url(obj, info):
         ref = obj.referral_codes.first()
         if ref is not None:
             return ref.url
 
     @staticmethod
-    def resolve_referral_registers(obj, *args, **kwargs):
+    def resolve_referral_registers(obj, info):
         return obj.get_referral_registers()
 
     @staticmethod
-    def resolve_selected_heroes(obj, *args, **kwargs):
+    def resolve_selected_heroes(obj, info):
         return obj.selected_heroes.select_related(
             'user',
             'hero',
@@ -55,6 +57,23 @@ class UserType(DjangoObjectType):
             'matchups',
             'hero__pro_matchups',
         ).order_by('-id')
+
+    @staticmethod
+    def resolve_bot_in_friends(obj, info):
+        user = info.context.user
+
+        if user == AnonymousUser():
+            return False
+
+        bot = BotAccount.objects.suitable_bot(is_main=True)
+
+        in_friends = wait_for_friend_request_answer(
+            steam_id=user.steamid,
+            bot_account=bot,
+            block=False,
+        )
+
+        return in_friends
 
 
 class UpdateOrCreateSelectedHero(graphene.Mutation):
@@ -164,12 +183,34 @@ class CreateReferralLink(graphene.Mutation):
         return CreateReferralLink(url=referral.url)
 
 
+class BefriendBot(graphene.Mutation):
+    error = graphene.String()
+
+    @staticmethod
+    def mutate(root, info):
+        user = info.context.user
+
+        if user == AnonymousUser():
+            return BefriendBot(error='You have to be logged in to befriend the bot')
+
+        bot = BotAccount.objects.suitable_bot(is_main=True)
+
+        success, eresult = send_friend_request(steam_id=user.steamid, bot_account=bot)
+        if not success:
+            return BefriendBot(error=f'Can\'t friend bot, error code {eresult}')
+
+        wait_for_friend_request_answer(steam_id=user.steamid, bot_account=bot)
+
+        return BefriendBot(error=None)
+
+
 class Mutations(graphene.ObjectType):
     update_or_create_selected_hero = UpdateOrCreateSelectedHero.Field()
     delete_selected_hero = DeleteSelectedHero.Field()
     toggle_selected_heroes = ToggleSelectedHeroes.Field()
     update_viewer_profile = UpdateViewerProfile.Field()
     create_referral_link = CreateReferralLink.Field()
+    befriend_bot = BefriendBot.Field()
 
 
 class Query(graphene.ObjectType):

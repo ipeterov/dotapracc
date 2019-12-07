@@ -158,7 +158,7 @@ class SelectedHeroes extends React.Component {
   }
 
   render() {
-    const { data } = this.props;
+    const { data, showProfileLink } = this.props;
     const { loading, error } = data;
 
     let zeroHeroesSelected;
@@ -182,6 +182,17 @@ class SelectedHeroes extends React.Component {
       <Grid container spacing={2} direction="column">
         <Grid item>
           <Grid container spacing={1}>
+            {showProfileLink && !zeroHeroesSelected && (
+              <Grid item>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  href="/"
+                >
+                  To my profile
+                </Button>
+              </Grid>
+            )}
             <Grid item>
               <AddHeroDialog
                 zeroHeroesSelected={zeroHeroesSelected}
@@ -222,11 +233,16 @@ class SelectedHeroes extends React.Component {
   }
 }
 
+SelectedHeroes.defaultProps = {
+  showProfileLink: false,
+};
+
 SelectedHeroes.propTypes = {
   delete: PropTypes.func.isRequired,
   updateOrCreate: PropTypes.func.isRequired,
   toggleSelectedHeroes: PropTypes.func.isRequired,
   data: PropTypes.object.isRequired,
+  showProfileLink: PropTypes.bool,
 };
 
 export default compose(

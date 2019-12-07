@@ -6,7 +6,7 @@ import gevent
 from dota2 import Dota2Client
 from steam import SteamClient
 from steam.enums import EResult
-from steam.enums.emsg import EMsg
+from steam.enums.common import EFriendRelationship
 
 
 @contextmanager
@@ -114,6 +114,32 @@ def send_friend_request(steam_id, bot_account):
     connect_with_retry(client)
     eresult, steam_id = client.friends.wait_event(client.friends.EVENT_FRIEND_ADD_RESULT)
     return eresult == EResult.OK, eresult
+
+
+def wait_for_friend_request_answer(steam_id, bot_account, block=True):
+    client = SteamClient()
+    steam_id = int(steam_id)
+
+    @client.on('connected')
+    def log_in():
+        client.login(username=bot_account.login, password=bot_account.password)
+
+    @client.friends.on('ready')
+    @client.friends.on('friend_new')
+    def check_friends(*args):
+        nonlocal client
+        friends = {
+            int(friend.steam_id)
+            for friend in client.friends if friend.relationship == EFriendRelationship.Friend
+        }
+        if steam_id in friends:
+            client.emit('cycle_finished', True)
+        elif not block:
+            client.emit('cycle_finished', False)
+
+    connect_with_retry(client)
+    in_friends = client.wait_event('cycle_finished')[0]
+    return in_friends
 
 
 def send_chat_message(steam_id, bot_account, message):
