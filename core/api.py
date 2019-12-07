@@ -177,7 +177,7 @@ class CreateReferralLink(graphene.Mutation):
         referral = user.referral_codes.create(
             code=code,
             label=code,
-            redirect_to=reverse('index'),
+            redirect_to=reverse('about'),
         )
 
         return CreateReferralLink(url=referral.url)
