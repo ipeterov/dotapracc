@@ -23,6 +23,11 @@ export default class Stats extends React.Component {
     this.connect();
   }
 
+  componentWillUnmount() {
+    this.sock.onclose = () => {};
+    this.sock.close();
+  }
+
   connect() {
     this.sock = new W3CWebSocket(wsUrl);
 
