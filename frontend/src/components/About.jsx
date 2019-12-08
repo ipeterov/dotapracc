@@ -22,7 +22,7 @@ export default function About() {
         container
         spacing={1}
         direction="column"
-        // style={{ marginTop: 100 }}
+        style={{ marginTop: 16 }}
       >
         <Grid item>
           <Typography variant="h2" style={{ whiteSpace: 'pre-line' }}>

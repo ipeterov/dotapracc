@@ -9,9 +9,7 @@ export default function Footer() {
   return (
     <AppBar
       style={{
-        bottom: '-8px',
-        margin: '0 -8px',
-        width: 'calc(100% + 16px)',
+        top: '16px',
         height: '100px',
       }}
       position="relative"

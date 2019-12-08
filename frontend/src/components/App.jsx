@@ -2,24 +2,38 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { ApolloProvider } from '@apollo/react-hooks';
 import ApolloClient from 'apollo-boost';
-import WebfontLoader from '@dr-kobros/react-webfont-loader';
+import { createMuiTheme } from '@material-ui/core/styles';
+import { ThemeProvider } from '@material-ui/styles';
+import CssBaseline from '@material-ui/core/CssBaseline';
 
 import Base from './Base';
 
 
 const client = new ApolloClient({ uri: `${window.location.origin}/gql/` });
 
-const config = {
-  google: { families: ['Roboto:300,400,500,700'] },
-};
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      main: '#283593',
+    },
+    secondary: {
+      main: '#ffca28',
+    },
+    background: {
+      paper: '#fff',
+      default: '#f1f1f1',
+    },
+  },
+});
 
 function App() {
   return (
-    <WebfontLoader config={config}>
+    <ThemeProvider theme={theme}>
       <ApolloProvider client={client}>
+        <CssBaseline />
         <Base />
       </ApolloProvider>
-    </WebfontLoader>
+    </ThemeProvider>
   );
 }
 

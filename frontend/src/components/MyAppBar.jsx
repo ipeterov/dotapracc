@@ -1,5 +1,6 @@
 import React from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import { Link as RouterLink, withRouter } from 'react-router-dom';
 import {
   AppBar, Grid, Link, Toolbar, Typography,
 } from '@material-ui/core';
@@ -7,12 +8,20 @@ import {
 import AvatarSection from './AvatarSection';
 
 
-export default function MyAppBar() {
+const menuItems = [
+  { label: 'About', link: '/about/' },
+  { label: 'Profile', link: '/' },
+  { label: 'Referrals', link: '/refs/' },
+];
+
+
+function MyAppBar({ location }) {
   return (
     <AppBar color="primary">
       <Toolbar>
         <Grid
           container
+          direction="row"
           justify="space-between"
           alignItems="center"
         >
@@ -24,45 +33,27 @@ export default function MyAppBar() {
             >
               <Grid item>
                 <Typography
-                  color="inherit"
+                  color="secondary"
                   variant="button"
                 >
                   dotapra.cc
                 </Typography>
               </Grid>
-              <Grid item>
-                <Link
-                  variant="overline"
-                  color="inherit"
-                  component={RouterLink}
-                  to="/"
-                >
-                  Profile
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link
-                  variant="overline"
-                  color="inherit"
-                  component={RouterLink}
-                  to="/about/"
-                >
-                  About
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link
-                  variant="overline"
-                  color="inherit"
-                  component={RouterLink}
-                  to="/refs/"
-                >
-                  Referrals
-                </Link>
-              </Grid>
+              {menuItems.map(({ label, link }) => (
+                <Grid item key={label}>
+                  <Link
+                    variant="overline"
+                    color="inherit"
+                    component={RouterLink}
+                    to={link}
+                    style={link === location.pathname ? { textDecoration: 'underline' } : {}}
+                  >
+                    {label}
+                  </Link>
+                </Grid>
+              ))}
             </Grid>
           </Grid>
-
           <Grid item>
             <AvatarSection />
           </Grid>
@@ -71,3 +62,9 @@ export default function MyAppBar() {
     </AppBar>
   );
 }
+
+MyAppBar.propTypes = {
+  location: PropTypes.object.isRequired,
+};
+
+export default withRouter(MyAppBar);
