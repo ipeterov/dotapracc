@@ -54,9 +54,11 @@ function MyAppBar({ location }) {
               ))}
             </Grid>
           </Grid>
-          <Grid item>
-            <AvatarSection />
-          </Grid>
+          {location.pathname !== '/wizard/' && (
+            <Grid item>
+              <AvatarSection />
+            </Grid>
+          )}
         </Grid>
       </Toolbar>
     </AppBar>
