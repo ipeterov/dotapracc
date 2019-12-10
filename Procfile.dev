@@ -1,3 +1,0 @@
-web: python3 manage.py runserver
-worker: celery -A dotapracc worker --beat --scheduler django_celery_beat.schedulers:DatabaseScheduler
-flower: celery flower -A dotapracc --broker=$REDISTOGO_URL
