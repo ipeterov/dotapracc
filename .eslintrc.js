@@ -63,7 +63,7 @@ module.exports = {
     'react/no-deprecated': 'warn',
     'react/no-unescaped-entities': 'off',
     'max-classes-per-file': 'off',
-    'react/jsx-curly-newline': 'off', // TODO: reevaluate
+    'react/jsx-curly-newline': 'off',
     'react/static-property-placement': 'off'
   }
 };
