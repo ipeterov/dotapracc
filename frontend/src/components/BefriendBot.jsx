@@ -30,7 +30,9 @@ function BefriendBot({ mutate, toNextStep }) {
     <>
       <Typography>
         While the site is relatively small, we will have to notify others
-        when you try to find a match
+        when you try to find a match. Please add our bot to friends to get
+        notifications as well. You will be able to turn notifications off
+        in your profile, or by unfriending the bot.
       </Typography>
       <Grid
         container
